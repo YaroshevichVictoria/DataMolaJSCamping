@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap');
+@media only screen and (max-width: 1960px){
+    .container{
+        width: 50%;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.7rem 0.8rem 0.5rem 1rem;
+    }
+}
+@media only screen and (max-width: 1440px){
+    .container{
+        width: 50%;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.7rem 0.8rem 0.5rem 1rem;
+    }
+}
+@media only screen and (max-width: 1280px){
+    .container{
+        width: 70%;
+        margin-top: 1rem;
+        padding: 0.7rem 0.8rem 0.5rem 1rem;
+    }
+}
+@media only screen and (max-width: 1024px){
+    .container{
+        width: 90%;
+        margin-top: 1rem;
+        padding: 0.7rem 0.8rem 0.5rem 1rem;
+    }
+}
+@media only screen and (max-width: 800px){
+    .container{
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.25rem;
+    }
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+html{
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+}
+.container{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    border: 1px solid #D8D8D8;
+}
+
+.villa-1-container{
+    display: grid;
+    grid-template-rows: 2fr 1fr;
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+    border: 1px solid #C7C7C7;
+}
+.villa-1-body{
+    display: grid;
+    grid-template-columns: 1.2fr 3fr 0.5fr;
+}
+.villa-1-photo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-right: 0.1rem;
+    background-size: 100%;
+    background-origin: border-box;
+    background-repeat: no-repeat;
+    background-image: url('https://i.pinimg.com/originals/72/28/d1/7228d1ff9aa40a401a184d6b3d8c79ba.jpg');
+}
+.villa-1-content{
+    margin-left: 1rem;
+    line-height: 2.4
+}
+.villa-1-name{
+    line-height: 0.6;
+}
+.genius-1{
+    height:1.2rem;
+    margin-top: -0.5px;
+}
+
+.villa-2-container{
+    display: grid;
+    grid-template-rows: 2fr 1fr;
+    padding: 1rem;
+    border: 1px solid #C7C7C7;
+}
+.villa-2-body{
+    display: grid;
+    grid-template-columns: 1.45fr 3.5fr 1fr;
+}
+.villa-2-photo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-right: 0.1rem;
+    background-size: 100%;
+    background-origin: border-box;
+    background-repeat: no-repeat;
+    background-image: url('https://static.prian.ru/uploads/2016_11/4/20161104082654655251083o.jpg');
+}
+.villa-2-content{
+    margin-left: 1rem;
+}
+.villa-2-name{
+    display: flex;
+    align-items: center;
+    height: 1rem;
+}
+.villa-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.2rem;
+    width: 3rem;
+    margin-right: 0.5rem;
+    font-size:12px;
+    color: white;
+    background-color: #478539;
+    border-radius: 3px;
+}
+.genius-2{
+    height: 1.2rem;
+    margin-top: 0.7rem;
+}
+
+.villas-icons{
+    display: flex;
+    align-items: center;
+}
+.stars-icons{
+    margin-right: 0.1rem;
+    color: #F5BD41;
+    font-size: 0.6rem;
+}
+.villas-recommend{
+    margin-bottom: 0.4rem;
+    font-size: 12px;
+    font-weight: 800;
+    color: black;
+    background-color: #FAFCFF;
+}
+.villas-information{
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+    line-height: 1.2;
+}
+.people-icons{
+    display: flex;
+    font-size: 0.9rem
+}
+.villas-comfort-text{
+    color: #2175C0;
+}
+.free-cancellation-text{
+    color: #478539;
+    font-weight: 800;
+}
+.risk-free-text{
+    color: #478539;
+}
+.villas-rating-body{
+    display: flex;
+    justify-content: flex-end;
+}
+.villas-rating{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.15rem;
+    width: 2.1rem;
+    margin-left: 0.5rem;
+    color: white;
+    object-fit: contain;
+    background-size: 100%;
+    background-position: center;
+    background-origin: border-box;
+    background-repeat: no-repeat;
+    background-image: url(img/rating.png);
+}
+.villas-grade{
+    text-align: right;
+    line-height: 1;
+}
+.grade-text{
+    font-size: 16px;
+    color: #10367B;
+}
+.square{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: -1.3rem;
+    margin-right: -1.3rem;
+    background-color: white;
+    border:1px solid #D8D8D8;
+}
+.villas-price-reservation{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+.villas-price{
+    text-align: right;
+}
+.price-text{
+    font-size: 18px;
+    color: black;
+}
+.button-price{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 2.5rem;
+    width: 11rem;
+    margin-top: 1rem;
+    padding-right: 1.3rem;
+    padding-left: 1.3rem;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    background-color: #2D71BC;
+}
+.button-price span{
+    color: white;
+}
+
+.breakfast-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.breakfast-included{
+    display: flex;
+    align-items: center;
+    height: 2rem;
+    margin-top: 0.5rem;
+    margin-left: -1.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 12px;
+    color: white;
+    background-color: #478539;
+    z-index: 100;
+    box-shadow: 1px 1px rgba(42, 99, 28, 0.32);
+}
+.triangle{
+    width: 0.25rem;
+    margin-left: -1.5rem;
+    border: 0.25rem solid transparent;
+    border-right: 0.25rem solid #478539;
+    border-top: 0.25rem solid #478539;
+}
+
+a{
+    font-size: 12px;
+    font-weight: 800;
+    color: #2175C0;
+}
+h2{
+    margin-top: 0.6rem;
+    color: #2D71BC;
+}
+span{
+    font-size: 12px;
+    font-weight: 700;
+    color: #646464;
+}
