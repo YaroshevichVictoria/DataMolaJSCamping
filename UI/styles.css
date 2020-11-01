@@ -21,6 +21,8 @@
         width: 50%;
     }
     .filter-container{
+        display: grid;
+        grid-template-rows: 1.6rem 1.6rem 1.6rem 1.6rem;
         width: 25%;
     }
     .filter-name,.filter-text,.filter-date{
@@ -57,6 +59,8 @@
         width: 60%;
     }
     .filter-container{
+        display: grid;
+        grid-template-rows: 1.6rem 1.6rem 1.6rem 1.6rem;
         width: 22%;
     }
     .filter-name,.filter-text,.filter-date{
@@ -93,6 +97,8 @@
         width: 80%;
     }
     .filter-container{
+        display: grid;
+        grid-template-rows: 1.6rem 1.6rem 1.6rem 1.6rem;
         width: 20%;
     }
     .filter-name,.filter-text,.filter-date{
@@ -129,6 +135,8 @@
         width: 100%;
     }
     .filter-container{
+        display: grid;
+        grid-template-rows: 1.6rem 1.6rem 1.6rem 1.6rem;
         width: 20%;
     }
     .filter-name,.filter-text,.filter-date{
@@ -201,7 +209,7 @@ header{
 .logo{
     height: 3.6rem;
     width: 3.6rem;
-    margin-top: 3px;
+    margin-top: 0.214rem;
     margin-right: auto;
 }
 .user-name{
@@ -216,7 +224,7 @@ header{
     margin-left: 0.7rem;
     color: #F3BDB6;
     background-color:  #1B1A1A;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border-width: 0;
 }
 /*---------------------MAIN--------------------------------*/
@@ -225,7 +233,6 @@ main{
     flex-direction: row;
     justify-content: flex-end;
     background-color: #10100F;
-    overflow: no-content;
 }
 /*---USER-LIST---*/
 .user-list{
@@ -242,7 +249,7 @@ main{
     text-align: center;
     color: rgba(236, 182, 175, 0.92);
     background-color: #1B1A1A;
-    border-radius: 7px;
+    border-radius: 0.5rem;
 }
 .online-users-list{
     display: flex;
@@ -279,7 +286,7 @@ main{
     width: 1.4rem;
     margin-right: 0.6rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 1rem;
     background-color: #BA8F89;
 }
 .button-private-messages .iconify{
@@ -302,7 +309,7 @@ main{
     text-align: center;
     color: #F3BDB6;
     background-color: #10100F;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border-width: 0;
 }
 .messages{
@@ -333,8 +340,8 @@ main{
     display: flex;
 }
 .triangle{
-    border: 10px solid transparent;
-    border-top: 10px solid #141413;
+    border: 0.714rem solid transparent;
+    border-top: 0.714rem solid #141413;
     border-right: 0 solid #141413;
 }
 .message-text{
@@ -342,12 +349,12 @@ main{
     padding: 0.5rem 1rem;
     color: #A3A1A1;
     background-color: #141413;
-    border-radius: 0 20px 20px 20px;
+    border-radius: 0 1.4rem 1.4rem 1.4rem;
 }
 .message-time-date{
     display: flex;
     flex-direction: column;
-    margin-left: 3px;
+    margin-left: 0.214rem;
     font-size: 10px;
     color: #515151;
 }
@@ -372,8 +379,8 @@ main{
     display: flex;
 }
 .my-triangle{
-    border: 10px solid transparent;
-    border-top: 10px solid #1B1A1A;
+    border: 0.714rem solid transparent;
+    border-top: 0.714rem solid #1B1A1A;
     border-left: 0 solid #1B1A1A;
 }
 .my-message-text{
@@ -382,7 +389,7 @@ main{
     text-align: left;
     color: #A3A1A1;
     background-color: #1B1A1A;
-    border-radius: 20px 0 20px 20px;
+    border-radius: 1.4rem 0 1.4rem 1.4rem;
     border: none;
 }
 
@@ -397,7 +404,7 @@ main{
     color: #A3A1A1;
     background-color: #1A1818;
     border-width: 0;
-    border-radius: 7px;
+    border-radius: 0.5rem;
 }
 #text-area-enter::-webkit-input-placeholder{
     color: #585656;
@@ -407,35 +414,31 @@ main{
     background-color: #10100F;
 }
 .filter-name{
-    height: 1.5rem;
     color: #F3BDB6;
     background-color: #1B1A1A;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border-width: 0;
 }
 .filter-text{
-    height: 1.5rem;
     color: #F3BDB6;
     background-color: #1B1A1A;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border-width: 0;
 }
 .filter-date{
-    height: 1.5rem;
     color: rgba(236, 182, 175, 0.58);
     background-color: #1B1A1A;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border-width: 0;
 }
 .button-filter{
-    height: 1.6rem;
     width: 14%;
     margin: 0 42%;
     padding-top: 0.13rem;
     font-weight: bold;
     color: #1B1A1A;
     background-color: #BA8F89;
-    border-radius: 7px;
+    border-radius: 0.5rem;
     border: none;
 }
 .filter-name::-webkit-input-placeholder{
@@ -484,8 +487,8 @@ footer{
     background-color: #2C2C2B;
 }
 ::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 0px;
-    border-radius: 0px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
     background-color: #777575;
 }
 ::-webkit-scrollbar-thumb:hover{
