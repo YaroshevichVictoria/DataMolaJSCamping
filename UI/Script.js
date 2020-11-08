@@ -1,4 +1,4 @@
-const messages=[
+const messages = [
     {
         id: '1',
         text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.',
@@ -175,154 +175,113 @@ const messages=[
     },
 ];
 
-const messagesModule=(function () {
+const messagesModule = (function () {
+    const filterObj = {
+        author: (message, author) => author && message.author.toLowerCase().includes(author.toLowerCase()),
+        text:  (message, text) => text && message.text.toLowerCase().includes(text.toLowerCase()),
+        dateTo:  (message, dateTo) => dateTo && message.createdAt < new Date(dateTo),
+        dateFrom:  (message, dateFrom) => dateFrom && message.createdAt > new Date(dateFrom)
+    };
+
+    const validateObj = {
+        text: (message) => message.text && message.text.length <= 200
+    };
+
+    let currentAuthor = 'Elizaveta Petreeva';
+
     return {
         getMessages:
             function (skip = 0, top = 10, filterConfig = {}) {
-                let arrMessages = [];
-                dateTo = new Date(filterConfig.dateTo);
-                dateFrom = new Date(filterConfig.dateFrom);
-                if('author' in filterConfig && 'text' in filterConfig  && 'dateTo' in filterConfig && 'dateFrom' in filterConfig) {
-                    for (let i of messages) {
-                        if (i.author.includes(filterConfig.author) && i.createdAt > dateFrom && i.createdAt < dateTo && i.text.includes(filterConfig.text)) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if('author' in filterConfig && !('text' in filterConfig) && 'dateTo' in filterConfig && 'dateFrom' in filterConfig) {
-                    for (let i of messages) {
-                        if (i.author.includes(filterConfig.author) && i.createdAt > dateFrom && i.createdAt < dateTo) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if(!('author' in filterConfig) && 'text' in filterConfig  && 'dateTo' in filterConfig && 'dateFrom' in filterConfig) {
-                    for (let i of messages) {
-                        if (i.createdAt > dateFrom && i.createdAt < dateTo && i.text.includes(filterConfig.text)) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if(!('author' in filterConfig) && !('text' in filterConfig) && 'dateTo' in filterConfig && 'dateFrom' in filterConfig) {
-                    for (let i of messages) {
-                        if (i.createdAt > dateFrom && i.createdAt < dateTo) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if('author' in filterConfig && 'text' in filterConfig && !('dateTo' in filterConfig) && !('dateFrom' in filterConfig)){
-                    for (let i of messages) {
-                        if (i.author.includes(filterConfig.author) && i.text.includes(filterConfig.text)) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if('author' in filterConfig && !('text' in filterConfig) && !('dateTo' in filterConfig) && !('dateFrom' in filterConfig)){
-                    for (let i of messages) {
-                        if (i.author.includes(filterConfig.author)) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if(!('author' in filterConfig) && 'text' in filterConfig  && !('dateTo' in filterConfig) && !('dateFrom' in filterConfig)){
-                    for (let i of messages) {
-                        if (i.text.includes(filterConfig.text)) {
-                            arrMessages.push(i);
-                        }
-                    }
-                }
-                if(!('author' in filterConfig) && !('text' in filterConfig)  && !('dateTo' in filterConfig) && !('dateFrom' in filterConfig)){
-                    for (let i of messages) {
-                            arrMessages.push(i);
-                    }
-                }
-                arrMessages.splice(0,skip);
-                if (arrMessages.length>top) {
+                let arrMessages = messages.slice();
+                Object.keys(filterConfig).forEach((key) => {
+                    arrMessages = arrMessages.filter((message) => filterObj[key](message, filterConfig[key]));
+                });
+                arrMessages.sort((d1, d2) => d1.createdAt - d2.createdAt);
+                arrMessages.splice(0, skip);
+                if (arrMessages.length > top) {
                     arrMessages.splice(top);
                 }
-                return arrMessages.sort((d1,d2)=>d1.createdAt-d2.createdAt);
-                },
+                return arrMessages;
+            },
 
         getMessage:
-            function(id=''){
-                messages.forEach((el)=>{el.id===id? console.log(el):''});
-                },
+            function (id = '') {
+              return messages.find((message) => message.id === id);
+            },
 
         validateMessage:
-            function (msg= {}) {
-                return ('id' in msg && 'text'in msg && 'createdAt' in msg && 'author' in msg && msg.text.length<=200 && msg.author.length>0);
-                },
+            function (msg = {}) {
+                return Object.keys(validateObj).every((key) => validateObj[key](msg));
+            },
 
         addMessage:
-            function (msg={}) {
-                if (this.validateMessage(msg) && (messages.map(message=>message.id)).indexOf(msg.id)===-1){
+            function (msg = {}) {
+                if (this.validateMessage(msg)) {
+                    msg.id = `${+new Date()}`;
+                    msg.createdAt = new Date();
+                    msg.author = currentAuthor;
                     messages.push(msg);
                     return true;
-                }
-                else return false;
-                },
+                } else return false;
+            },
 
         editMessage:
             function(id='', msg={}){
-                for(let el of messages){
-                    if(el.id===id && this.validateMessage(el)){
-                        el.text=msg.text;
-                        return true;
-                    }
-                    else if(!this.validateMessage(el)){return false;}
-                }
-                },
+                let index = messages.indexOf(this.getMessage(id));
+                if(index !== -1) {
+                    let result = this.getMessage(id);
+                    result.text = msg.text;
+                    return (this.validateMessage(result));
+                }else return false;
+            },
 
         removeMessage:
-            function (id=''){
-                for (let el of messages){
-                    if(el.id===id && this.validateMessage(el)){
-                        let index=messages.indexOf(el);
-                        messages.splice(index,1)
-                        return true;
-                    }
-                    else if (!this.validateMessage(el))return false;
-                }
-        }
-}}
+            function (id = '') {
+                let index = messages.indexOf(this.getMessage(id));
+                if(index !== -1) {
+                    messages.splice(index, 1);
+                    return true;
+                }return false;
+            }
+    }
+}
 ());
-console.log(messagesModule.getMessages(0,10,{author:'Elizaveta',dateFrom:'2020-08-08',dateTo:'2020-10-10',text:'nec odio'}))
+console.log(messagesModule.getMessages(0, 10, {
+    author: 'Elizaveta',
+    text: 'nec odio',
+    dateFrom: '2020-08-08',
+    dateTo: '2020-10-10'
+}))
 console.log(messagesModule.getMessages(12, 10))
-console.log(messagesModule.getMessages(0,10,{text: 'adipiscing'}))
-console.log(messagesModule.getMessages(0, 10, {author:'Victoria'}))
+console.log(messagesModule.getMessages(0, 10, {text: 'adipiscing'}))
+console.log(messagesModule.getMessages(0, 10, {author: 'Victoria'}))
 
-messagesModule.getMessage('1')
-messagesModule.getMessage('20')
+console.log(messagesModule.getMessage('1'))
+console.log(messagesModule.getMessage('20'))
 
 console.log(messagesModule.validateMessage({
-    id: '5',
-    text: 'Какие dela?',
+    text: 'Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.',
     createdAt: new Date('2020-09-09T13:36:15'),
     author: 'Elizaveta Petreeva',
     isPersonal: false
 }))
 console.log(messagesModule.validateMessage({
-    text: 'Какие dela?',
     createdAt: new Date('2020-09-09T13:36:15'),
     author: 'Elizaveta Petreeva',
     isPersonal: false
 }))
 
 console.log(messagesModule.addMessage({
-    id: '25',
-    text: 'Какие dela?',
-    createdAt: new Date('2020-09-09T13:36:15'),
-    author: 'Elizaveta Petreeva',
-    isPersonal: false}))
+    text: 'vulputate eget, arcu',
+    isPersonal: false
+}))
 console.log(messagesModule.addMessage({
-    id: '25',
-    createdAt: new Date('2020-09-09T13:36:15'),
-    author: 'Elizaveta Petreeva',
-    isPersonal: false}))
+    isPersonal: false
+}))
 
-console.log(messagesModule.editMessage('7',{text:'bla'}))
-console.log(messagesModule.editMessage('25',{text:'bla'}))
+console.log(messagesModule.editMessage('24', {text: 'bla'}))
+console.log(messagesModule.editMessage('30', {text: 'bla'}))
 
-console.log(messagesModule.removeMessage('3'))
-console.log(messagesModule.removeMessage('25'))
+console.log(messagesModule.removeMessage('1'))
+console.log(messagesModule.removeMessage('26'))
 
