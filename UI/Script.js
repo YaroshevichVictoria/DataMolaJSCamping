@@ -1,287 +1,163 @@
-const messages = [
-    {
-        id: '1',
-        text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.',
-        createdAt: new Date('2020-10-13T13:00:00'),
-        author: 'Alexey Chirko',
-        isPersonal: false,
-    },
-    {
-        id: '2',
-        text: ' Aenean massa?',
-        createdAt: new Date('2020-10-13T13:10:05'),
-        author: 'Yanina Minina',
-        isPersonal: false
-    },
-    {
-        id: '3',
-        text: 'Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
-        createdAt: new Date('2020-10-12T15:11:00'),
-        author: 'Vladimir Andreev',
-        isPersonal: false
-    },
-    {
-        id: '4',
-        text: 'Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.',
-        createdAt: new Date('2020-10-13T13:11:20'),
-        author: 'Elizaveta Petreeva',
-        isPersonal: false
-    },
-    {
-        id: '5',
-        text: 'Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.',
-        createdAt: new Date('2020-10-13T12:12:00'),
-        author: 'Victoria Yaroshevich',
-        isPersonal: false
-    },
-    {
-        id: '6',
-        text: 'In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo',
-        createdAt: new Date('2020-10-12T08:12:50'),
-        author: 'Anna Kolesnikova',
-        isPersonal: true,
-        to: 'Victoria Yaroshevich'
-    },
-    {
-        id: '7',
-        text: 'Nullam dictum felis eu pede mollis pretium.',
-        createdAt: new Date('2020-10-12T13:13:00'),
-        author: 'Anton Averin',
-        isPersonal: false
-    },
-    {
-        id: '8',
-        text: 'Integer tincidunt.',
-        createdAt: new Date('2020-10-12T13:14:05'),
-        author: 'Anastasia Ostashenko',
-        isPersonal: false
-    },
-    {
-        id: '9',
-        text: 'Cras dapibus. Vivamus elementum semper nisi.',
-        createdAt: new Date('2020-10-12T12:40:00'),
-        author: 'Nikolai Ivanov',
-        isPersonal: true,
-        to: 'Yanina Minina'
-    },
-    {
-        id: '10',
-        text: 'Aenean vulputate eleifend tellus.',
-        createdAt: new Date('2020-10-12T12:15:50'),
-        author: 'Mikhail Leonov',
-        isPersonal: false
-    },
-    {
-        id: '11',
-        text: ' Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim',
-        createdAt: new Date('2020-10-12T13:16:27'),
-        author: 'Vladilen Nikonov',
-        isPersonal: false
-    },
-    {
-        id: '12',
-        text: 'Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus.',
-        createdAt: new Date('2020-10-12T10:19:00'),
-        author: 'Anna Kolesnikova',
-        isPersonal: false
-    },
-    {
-        id: '13',
-        text: 'Phasellus viverra nulla ut metus varius laoreet.',
-        createdAt: new Date('2020-10-12T10:19:48'),
-        author: 'Anna Kolesnikova',
-        isPersonal: false
-    },
-    {
-        id: '14',
-        text: 'Quisque rutrum',
-        createdAt: new Date('2020-10-12T13:20:00'),
-        author: 'Yanina Minina',
-        isPersonal: true,
-        to: 'Victoria Yaroshevich'
-    },
-    {
-        id: '15',
-        text: 'Aenean imperdiet',
-        createdAt: new Date('2020-10-12T09:21:45'),
-        author: 'Yanina Minina',
-        isPersonal: false
-    },
-    {
-        id: '16',
-        text: 'Etiam ultricies nisi vel augue.',
-        createdAt: new Date('2020-10-12T13:30:00'),
-        author: 'Victoria Yaroshevich',
-        isPersonal: true,
-        to: 'Yanina Minina'
-    },
-    {
-        id: '17',
-        text: 'Curabitur ullamcorper ultricies nisi.',
-        createdAt: new Date('2020-10-12T14:31:10'),
-        author: 'Anton Averin',
-        isPersonal: false
-    },
-    {
-        id: '18',
-        text: 'Nam eget dui',
-        createdAt: new Date('2020-10-12T12:31:27'),
-        author: 'Yanina Minina',
-        isPersonal: false
-    },
-    {
-        id: '19',
-        text: 'Etiam rhoncus.',
-        createdAt: new Date('2020-10-12T13:35:00'),
-        author: 'Alexey Chirko',
-        isPersonal: false
-    },
-    {
-        id: '20',
-        text: 'Maecenas tempus, tellus eget condimentum rhoncus',
-        createdAt: new Date('2020-09-09T10:36:15'),
-        author: 'Elizaveta Petreeva',
-        isPersonal: false
-    },
-    {
-        id: '21',
-        text: 'Sem quam semper libero',
-        createdAt: new Date('2020-09-09T10:36:15'),
-        author: 'Elizaveta Petreeva',
-        isPersonal: false
-    },
-    {
-        id: '22',
-        text: 'Sit amet adipiscing sem neque sed ipsum.',
-        createdAt: new Date('2020-09-09T10:36:15'),
-        author: 'Elizaveta Petreeva',
-        isPersonal: false
-    },
-    {
-        id: '23',
-        text: 'Maecenas nec odio et ante tincidunt tempus',
-        createdAt: new Date('2020-09-09T10:36:15'),
-        author: 'Elizaveta Petreeva',
-        isPersonal: true,
-        to: 'Victoria Yaroshevich'
-    },
-    {
-        id: '24',
-        text: 'Maecenas nec odio et ante tincidunt tempus',
-        createdAt: new Date('2020-09-09T10:36:15'),
-        author: '',
-        isPersonal: true,
-        to: 'Victoria Yaroshevich'
-    },
-];
+class Message {
+    constructor(msg = {}) {
+        this._id = msg.id || `${+new Date()}`;
+        this.text = msg.text;
+        this._createdAt = msg.createdAt && msg.createdAt !== '' ? new Date(msg.createdAt) : new Date();
+        this._author = msg.author;
+        this.isPersonal = msg.isPersonal ?? !!msg.to;
+        this.to = msg.to;
+    }
 
-const messagesModule = (function () {
-    const filterObj = {
-        author: (message, author) => author && message.author.toLowerCase().includes(author.toLowerCase()),
-        text:  (message, text) => text && message.text.toLowerCase().includes(text.toLowerCase()),
-        dateTo:  (message, dateTo) => dateTo && message.createdAt < new Date(dateTo),
-        dateFrom:  (message, dateFrom) => dateFrom && message.createdAt > new Date(dateFrom)
-    };
+    get id() {
+        return this._id;
+    }
 
-    const validateObj = {
-        text: (message) => message.text && message.text.length <= 200
-    };
+    get author() {
+        return this._author;
+    }
 
-    let currentAuthor = 'Elizaveta Petreeva';
-
-    return {
-        getMessages:
-            function (skip = 0, top = 10, filterConfig = {}) {
-                let arrMessages = messages.slice();
-                Object.keys(filterConfig).forEach((key) => {
-                    arrMessages = arrMessages.filter((message) => filterObj[key](message, filterConfig[key]));
-                });
-                arrMessages.sort((d1, d2) => d1.createdAt - d2.createdAt);
-                arrMessages.splice(0, skip);
-                if (arrMessages.length > top) {
-                    arrMessages.splice(top);
-                }
-                return arrMessages;
-            },
-
-        getMessage:
-            function (id = '') {
-              return messages.find((message) => message.id === id);
-            },
-
-        validateMessage:
-            function (msg = {}) {
-                return Object.keys(validateObj).every((key) => validateObj[key](msg));
-            },
-
-        addMessage:
-            function (msg = {}) {
-                if (this.validateMessage(msg)) {
-                    msg.id = `${+new Date()}`;
-                    msg.createdAt = new Date();
-                    msg.author = currentAuthor;
-                    messages.push(msg);
-                    return true;
-                } else return false;
-            },
-
-        editMessage:
-            function(id='', msg={}){
-                let index = messages.indexOf(this.getMessage(id));
-                if(index !== -1) {
-                    let result = this.getMessage(id);
-                    result.text = msg.text;
-                    return (this.validateMessage(result));
-                }else return false;
-            },
-
-        removeMessage:
-            function (id = '') {
-                let index = messages.indexOf(this.getMessage(id));
-                if(index !== -1) {
-                    messages.splice(index, 1);
-                    return true;
-                }return false;
-            }
+    get createdAt() {
+        return this._createdAt;
     }
 }
-());
-console.log(messagesModule.getMessages(0, 10, {
-    author: 'Elizaveta',
-    text: 'nec odio',
-    dateFrom: '2020-08-08',
-    dateTo: '2020-10-10'
-}))
-console.log(messagesModule.getMessages(12, 10))
-console.log(messagesModule.getMessages(0, 10, {text: 'adipiscing'}))
-console.log(messagesModule.getMessages(0, 10, {author: 'Victoria'}))
 
-console.log(messagesModule.getMessage('1'))
-console.log(messagesModule.getMessage('20'))
+class MessageList {
+    _user;
 
-console.log(messagesModule.validateMessage({
-    text: 'Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.',
-    createdAt: new Date('2020-09-09T13:36:15'),
-    author: 'Elizaveta Petreeva',
-    isPersonal: false
-}))
-console.log(messagesModule.validateMessage({
-    createdAt: new Date('2020-09-09T13:36:15'),
-    author: 'Elizaveta Petreeva',
-    isPersonal: false
-}))
+    static _filterObj = {
+        author: (message, author) => author && message.author.toLowerCase().includes(author.toLowerCase()),
+        text: (message, text) => text && message.text.toLowerCase().includes(text.toLowerCase),
+        dateTo: (message, dateTo) => dateTo && message.createdAt < new Date(dateTo),
+        dateFrom: (message, dateFrom) => dateFrom && message.createdAt > new Date(dateFrom),
+    }
 
-console.log(messagesModule.addMessage({
-    text: 'vulputate eget, arcu',
-    isPersonal: false
-}))
-console.log(messagesModule.addMessage({
-    isPersonal: false
-}))
+    static _validateObj = {
+        id: (message) => message.id,
+        text: (message) => message.text && message.text.length <= 200,
+        author: (message) => message.author && message.author.length > 0,
+        createdAt: (message) => message.createdAt,
+    }
 
-console.log(messagesModule.editMessage('24', {text: 'bla'}))
-console.log(messagesModule.editMessage('30', {text: 'bla'}))
+    static _validateEditObj = {
+        text: (message) => message.text && message.text.length <= 200,
+        to: (message) => message.to && message.to !== '',
+    }
 
-console.log(messagesModule.removeMessage('1'))
-console.log(messagesModule.removeMessage('26'))
+    static validate(msg = {}) {
+        return Object.keys(this._validateObj).every((key) => this._validateObj[key](msg));
+    }
 
+    static validEditMessage(msg = {}) {
+        return Object.keys(this._validateEditObj).some((key) => this._validateEditObj[key](msg));
+    }
+
+    constructor(msgs = []) {
+        this._arrMessages = msgs;
+        this._notValidMessages = [];
+    }
+
+    set user(name) {
+        this._user = name;
+    }
+
+    get user() {
+        return this._user;
+    }
+
+    getPage(skip = 0, top = 10, filterConfig = {}) {
+        let resultArr = this._arrMessages.slice();
+        Object.keys(filterConfig).forEach((key) => {
+            resultArr = resultArr.filter((message) => MessageList._filterObj[key](message, filterConfig[key]));
+        });
+        resultArr = resultArr.filter((message) => message.author === this.user || message.isPersonal === false || message.to === this.user);
+        resultArr.sort((d1, d2) => d1.createdAt - d2.createdAt);
+        resultArr.splice(0, skip);
+        if (resultArr.length > top) {
+            resultArr.splice(top);
+        }
+        return resultArr;
+    }
+
+    add(msg = {}) {
+        if (this.user) {
+            const message = new Message(msg);
+            if (MessageList.validate(msg)) {
+                this._arrMessages.push(message);
+                return true;
+            } return false;
+        } return false;
+    }
+
+    get(id = '') {
+        return this._arrMessages.find((message) => message.id === id);
+    }
+
+    edit(idNew, msg = {}) {
+        if (this.user) {
+            const foundMessage = this.get(idNew);
+            if (MessageList.validate(foundMessage) && MessageList.validEditMessage(msg) && foundMessage.author === this.user) {
+                if (msg.text) {
+                    foundMessage.text = msg.text;
+                }
+                if (msg.to) {
+                    foundMessage.to = msg.to;
+                } return true;
+            } return false;
+        } return false;
+    }
+
+    remove(idNew) {
+        if (this.user) {
+            const index = this._arrMessages.findIndex((message) => message.id === idNew && message.author === this.user);
+            if (index !== -1) {
+                this._arrMessages.splice(index, 1);
+                return true;
+            } return false;
+        } return false;
+    }
+
+    addAll(msgs = []) {
+        msgs.forEach((message) => {
+            const mess = new Message(message);
+            MessageList.validate(mess) ? this._arrMessages.push(mess) : this._notValidMessages.push(mess);
+        });
+        return this._notValidMessages;
+    }
+
+    clear() {
+        this._arrMessages.splice(0);
+    }
+}
+
+const message1 = new Message({ id: 6, text: 'Lorem ipsum', createdAt: '2020-10-13T13:05:00', author: 'Yanina Chirko', isPersonal: false });
+const message2 = new Message({ text: 'dolor sit amet', author: 'Victoria Yaroshevich', isPersonal: false });
+const list = new MessageList([message1]);
+list.user = 'Victoria Yaroshevich';
+
+console.log(list.add(message2));
+console.log(list.add({ id: 7, text: 'porttitor eu', createdAt: '2020-10-13T13:05:00', author: 'Alexander Averin', isPersonal: true, to: 'Victoria Yaroshevich' }));
+console.log(list.add({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: list.user, isPersonal: true, to: 'Yanina Chirko' }));
+console.log(list.add({ id: 9, text: 'consequat vitae' }));
+
+console.log(list.edit(8, { text: 'How do you do?', to: 'Alexander Averin' }));
+console.log(list.edit(7, { text: 'Hello' }));
+list.user = 'Alexander Averin';
+console.log(list.edit(7, { text: 'Hello' }));
+
+console.log(list.get(7));
+
+console.log(list.getPage(0, 10, { dateFrom: '2020-10-12T11:00:00', dateTo: '2020-11-13T14:00:00' }));
+list.user = 'Yanina Chirko';
+console.log(list.getPage(0, 10, { dateTo: '2020-11-13T14:00:00' }));
+
+console.log(list.remove(7));
+list.user = 'Victoria Yaroshevich';
+console.log(list.remove(8));
+console.log(list.remove(9));
+
+console.log(list.addAll([
+    { id: 10, text: 'Vivamus elementum semper nisi', createdAt: '', author: 'Victoria Yaroshevich', isPersonal: false },
+    { text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'hgflkh', isPersonal: false },
+    { id: 12 }]));
+list.clear();
+console.log(list);
