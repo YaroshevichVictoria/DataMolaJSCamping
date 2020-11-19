@@ -3,6 +3,8 @@
         "airbnb-base"
     ],
     "rules": {
+        "class-methods-use-this": "off",
+        "no-undef": "off",
         "max-len": "off",
         "no-console": "off",
         "object-curly-spacing": "warn",
