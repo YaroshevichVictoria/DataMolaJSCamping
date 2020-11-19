@@ -17,7 +17,7 @@
         display: flex;
         width: 25%;
     }
-    .online-users,.online-users-list{
+    .users,.users-list{
         width: 50%;
     }
     .filter-container{
@@ -55,7 +55,7 @@
         display: flex;
         width: 22%;
     }
-    .online-users,.online-users-list{
+    .users,.users-list{
         width: 60%;
     }
     .filter-container{
@@ -93,7 +93,7 @@
         display: flex;
         width: 20%;
     }
-    .online-users,.online-users-list{
+    .users,.users-list{
         width: 80%;
     }
     .filter-container{
@@ -131,7 +131,7 @@
         display: flex;
         width: 20%;
     }
-    .online-users,.online-users-list{
+    .users,.users-list{
         width: 100%;
     }
     .filter-container{
@@ -165,7 +165,7 @@
     .chat{
         width: 100%;
     }
-    .user-list, .online-users, .online-users-list{
+    .user-list, .users,.users-list{
         display: none;
     }
     .filter-container{
@@ -241,7 +241,7 @@ main{
     background-color: #10100F;
     border-width: 0;
 }
-.online-users{
+.users{
     height: 1.5rem;
     margin-bottom: 0.5rem;
     margin-right: 0.2rem;
@@ -251,17 +251,26 @@ main{
     background-color: #1B1A1A;
     border-radius: 0.5rem;
 }
-.online-users-list{
+.users-list{
     display: flex;
     flex-direction: column;
     justify-content: center;
     overflow: auto;
 }
-.user{
+.active-user{
     display: flex;
     align-items: center;
     height: 1.5rem;
     color: #B78A84;
+    margin-bottom: 0.3rem;
+    margin-right: 0.2rem;
+    border-bottom: 1px solid #292727;
+}
+.user{
+    display: flex;
+    align-items: center;
+    height: 1.5rem;
+    color: #725652;
     margin-bottom: 0.3rem;
     margin-right: 0.2rem;
     border-bottom: 1px solid #292727;
@@ -288,6 +297,9 @@ main{
     border: none;
     border-radius: 1rem;
     background-color: #BA8F89;
+}
+.user .button-private-messages{
+    visibility: hidden;
 }
 .button-private-messages .iconify{
     height: 1.3rem;
@@ -326,6 +338,8 @@ main{
     margin-bottom: 1rem;
 }
 .my-message-container .message-time-date{
+    display: flex;
+    align-items: flex-end;
     margin-right: 0.2rem;
 }
 .message-author{
@@ -358,11 +372,11 @@ main{
     font-size: 10px;
     color: #515151;
 }
-
 .my-message-container{
     display: grid;
     grid-template-rows: 1rem minmax(2rem, auto);
     width: 70%;
+    justify-items: end;
     margin-left: auto;
     margin-bottom: 1rem;
 }
@@ -373,10 +387,12 @@ main{
 }
 .my-message-body{
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
 }
 .my-message-area{
     display: flex;
+    flex-direction: row-reverse;
 }
 .my-triangle{
     border: 0.714rem solid transparent;
@@ -472,10 +488,11 @@ footer{
 .button-show-more:hover{
     background-color: #272525;
 }
-.user:hover{
-    color: #F8CAC5;
-    background-color: #272525;
+.active-user:hover{
+    color: #e9bcb7;
+    background-color: #131313;
 }
+
 .button-private-messages:hover{
     background-color: #F8CAC5;
 }
