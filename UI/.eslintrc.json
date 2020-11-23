@@ -3,6 +3,7 @@
         "airbnb-base"
     ],
     "rules": {
+        "no-use-before-define": "off",
         "class-methods-use-this": "off",
         "no-undef": "off",
         "max-len": "off",

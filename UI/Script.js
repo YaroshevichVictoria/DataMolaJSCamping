@@ -21,11 +21,11 @@ function formatTime(date = '') {
 }
 
 class Message {
-    constructor(msg = {}) {
+    constructor(msg = { }) {
         this._id = msg.id || `${+new Date()}`;
         this.text = msg.text;
         this._createdAt = msg.createdAt ? new Date(msg.createdAt) : new Date();
-        this._author = msg.author;
+        this._author = msg.author || messageList.user;
         this.isPersonal = msg.isPersonal ?? !!msg.to;
         this.to = msg.to;
     }
@@ -52,10 +52,7 @@ class MessageList {
     }
 
     static _validateObj = {
-        id: (message) => message.id,
         text: (message) => message.text && message.text.length <= 200,
-        author: (message) => message.author && message.author.length > 0,
-        createdAt: (message) => message.createdAt,
     }
 
     static _validateEditObj = {
@@ -72,7 +69,7 @@ class MessageList {
     }
 
     constructor(msgs = []) {
-        MessageList._arrMessages = msgs;
+        this._arrMessages = msgs;
         this._notValidMessages = [];
     }
 
@@ -85,7 +82,7 @@ class MessageList {
     }
 
     getPage(skip = 0, top = 10, filterConfig = {}) {
-        let resultArr = MessageList._arrMessages.slice();
+        let resultArr = this._arrMessages.slice();
         Object.keys(filterConfig).forEach((key) => {
             resultArr = resultArr.filter((message) => MessageList._filterObj[key](message, filterConfig[key]));
         });
@@ -102,14 +99,14 @@ class MessageList {
         if (this.user) {
             const message = new Message(msg);
             if (MessageList.validate(msg)) {
-                MessageList._arrMessages.push(message);
+                this._arrMessages.push(message);
                 return true;
             } return false;
         } return false;
     }
 
     get(id = '') {
-        return MessageList._arrMessages.find((message) => message.id === id);
+        return this._arrMessages.find((message) => message.id === id);
     }
 
     edit(idNew, msg = { text: '', to: null }) {
@@ -128,9 +125,9 @@ class MessageList {
 
     remove(idNew) {
         if (this.user) {
-            const index = MessageList._arrMessages.findIndex((message) => message.id === idNew && message.author === this.user);
+            const index = this._arrMessages.findIndex((message) => message.id === idNew && message.author === this.user);
             if (index !== -1) {
-                MessageList._arrMessages.splice(index, 1);
+                this._arrMessages.splice(index, 1);
                 return true;
             } return false;
         } return false;
@@ -139,20 +136,24 @@ class MessageList {
     addAll(msgs = []) {
         msgs.forEach((message) => {
             const mess = new Message(message);
-            MessageList.validate(mess) ? MessageList._arrMessages.push(mess) : this._notValidMessages.push(mess);
+            MessageList.validate(mess) ? this._arrMessages.push(mess) : this._notValidMessages.push(mess);
         });
         return this._notValidMessages;
     }
 
     clear() {
-        MessageList._arrMessages.splice(0);
+        this._arrMessages.splice(0);
     }
 }
 
 class UserList {
    constructor(users = [], activeUsers = []) {
-        UserList.users = users;
-        UserList.activeUsers = activeUsers;
+        this._users = users;
+        this.activeUsers = activeUsers;
+    }
+
+    get users() {
+       return this._users;
     }
 }
 
@@ -173,19 +174,14 @@ class MessagesView {
         this.container = document.getElementById(containerId);
     }
 
-    display(arr = MessageList._arrMessages) {
-        this.container.innerHTML = arr.map((message) => `<div class=${message._author === MessageList.prototype.user
-        ? 'my-message-container' : 'message-container'}>
-                                        <div class=${message._author === MessageList.prototype.user
-            ? 'my-message-author' : 'message-author'}>${message._author}:</div>
-                                        <div class=${message._author === MessageList.prototype.user
-            ? 'my-message-body' : 'message-body'}>
-                                            <div class=${message._author === MessageList.prototype.user
-            ? 'my-message-area' : 'message-area'}>
-                                                <div class=${message._author === MessageList.prototype.user
-            ? 'my-triangle' : 'triangle'}></div>
-                                                <div class=${message._author === MessageList.prototype.user
-            ? 'my-message-text' : 'message-text'}>
+    display(arr) {
+        this.container.innerHTML = arr.map((message) => (message._author === messageList.user
+                                    ? `<div class='my-message-container'>
+                                        <div class='my-message-author'>${message._author}:</div>
+                                        <div class='my-message-body'>
+                                            <div class='my-message-area'>
+                                                <div class='my-triangle'></div>
+                                                <div class='my-message-text'>
                                                     <p><span>${message.text}</span>
                                                     </p>
                                                 </div>
@@ -195,7 +191,23 @@ class MessagesView {
                                                 <div class="message-date">${formatDate(message._createdAt)}</div>
                                             </div>
                                         </div>
-                                    </div>`).join('');
+                                    </div>`
+                                    : `<div class='message-container'>
+                                        <div class='message-author'>${message._author}:</div>
+                                        <div class='message-body'>
+                                            <div class='message-area'>
+                                                <div class='triangle'></div>
+                                                <div class='message-text'>
+                                                    <p><span>${message.text}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="message-time-date">
+                                                <div class="message-time">${formatTime(message._createdAt)}</div>
+                                                <div class="message-date">${formatDate(message._createdAt)}</div>
+                                            </div>
+                                        </div>
+                                    </div>`)).join('');
 }
 }
 
@@ -204,8 +216,8 @@ class UsersView {
         this.container = document.getElementById(containerId);
     }
 
-    display(arr = []) {
-        this.container.innerHTML = arr.map((user) => `<div class=${UserList.activeUsers.includes(user) ? 'active-user' : 'user'}>
+    display(arr) {
+        this.container.innerHTML = arr.map((user) => `<div class=${userList.activeUsers.includes(user) ? 'active-user' : 'user'}>
                     <button type="button" class="button-private-messages">
                         <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
                     </button>
@@ -214,62 +226,55 @@ class UsersView {
     }
 }
 
-// class FilterView не нужен,т.к. фильтры отобр на стр всегда
-
 function setCurrentUser(user = '') {
-    new HeaderView('userNameId').display(user);
-    MessageList.prototype.user = user;
-    if (MessageList.prototype.user) {
+    headerView.display(user);
+    messageList.user = user;
+    if (messageList.user) {
         document.getElementById('input').innerHTML = '<textarea id="text-area-enter" cols="102" rows="3" placeholder="  Press Enter to send the message."/>';
         document.getElementById('button-log-out').textContent = 'Log out';
     }
 }
 
 function addMessage({ text = '', isPersonal = false, to = null }) {
-     const id = `+${new Date()}`;
-     const createdAt = new Date();
-     const author = MessageList.prototype.user;
-     if (!to) { // личные сообщения отображаются в личных диалогах, а не на гл стр
-         console.log(MessageList.prototype.add({ id, text, createdAt, author, isPersonal }));
-         new MessagesView('messages').display();
+     if (!to) {
+         if (messageList.add({ text, isPersonal })) messagesView.display(messageList.getPage());
      }
 }
 
 function editMessage(id = `+${new Date()}`, { text = '', to = '' }) {
-    MessageList.prototype.edit(id, { text, to });
-    new MessagesView('messages').display();
+    if (messageList.edit(id, { text, to }))messagesView.display(messageList.getPage());
 }
 
 function removeMessage(id = '') {
-    MessageList.prototype.remove(id);
-    new MessagesView('messages').display();
+    if (messageList.remove(id))messagesView.display(messageList.getPage());
 }
 
 function showMessages(skip = 0, top = 10, filterConfig = {}) {
-    const arr = MessageList.prototype.getPage(skip, top, filterConfig);
-    new MessagesView('messages').display(arr);
+    const arr = messageList.getPage(skip, top, filterConfig);
+    messagesView.display(arr);
 }
 
 function showUsers() {
-    const arr = UserList.activeUsers.concat(UserList.users);
-    const usersArr = Array.from(new Set(arr));
-    new UsersView('users-list').display(usersArr);
+    usersView.display(userList.users);
 }
 
 const message1 = new Message({ id: 6, text: 'Lorem ipsum', createdAt: '2020-10-09T13:05:00', author: 'Yanina Chirko' });
 const message3 = new Message({ id: 15, text: 'ipsum', createdAt: '2020-10-13T19:05:00', author: 'Polina Skoraya' });
 const message2 = new Message({ text: 'dolor sit amet', author: 'Victoria Yaroshevich' });
-const message4 = new Message({ id: 7, text: 'porttitor eu', createdAt: '2020-10-13T13:05:00', author: 'Alexander Averin', isPersonal: true, to: 'Victoria Yaroshevich' });
-const message5 = new Message({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: 'Alexey Yaroshevich' });
-const message6 = new Message({ text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'Anastasia Ostashenko' });
-const message7 = new Message({ id: 10, text: 'Vivamus elementum semper nisi', createdAt: '', author: 'Victoria Yaroshevich' });
-const list = new MessageList([message1, message2, message3, message4, message5, message6, message7]);
-const listUsers = new UserList(['Yanina Chirko', 'Polina Skoraya', 'Alexey Yaroshevich', 'Victoria Yaroshevich', 'Alexander Averin', 'Anastasia Ostashenko'],
+const message4 = new Message({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: 'Alexey Yaroshevich' });
+const message5 = new Message({ text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'Anastasia Ostashenko' });
+const message6 = new Message({ id: 10, text: 'Vivamus elementum semper nisi', author: 'Victoria Yaroshevich' });
+
+const messageList = new MessageList([message1, message2, message3, message4, message5, message6]);
+const userList = new UserList(['Yanina Chirko', 'Polina Skoraya', 'Alexey Yaroshevich', 'Victoria Yaroshevich', 'Alexander Averin', 'Anastasia Ostashenko'],
     ['Victoria Yaroshevich', 'Yanina Chirko', 'Alexander Averin', 'Anastasia Ostashenko']);
+const headerView = new HeaderView('userNameId');
+const messagesView = new MessagesView('messages');
+const usersView = new UsersView('users-list');
 
 setCurrentUser('Victoria Yaroshevich');
 
-addMessage({ text: 'Vivamus elementum' });
+addMessage({ text: 'Vivamus elemlkmlmentum' });
 
 editMessage(10, { text: 'hahahahaha' });
 
