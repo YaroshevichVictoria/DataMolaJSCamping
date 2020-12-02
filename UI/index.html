@@ -5,30 +5,86 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>EduChat</title>
     <link href="styles.css" rel="stylesheet" type="text/css" media="all" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body>
-        <header>
+<body id="body">
+        <header id="header">
             <img src="img/Logo.png" alt="Logotype" class="logo">
             <span class="user-name" id = "userNameId"></span>
             <button type="button" class="button-log-out" id="button-log-out">Log in</button>
         </header>
-        <main>
+
+        <main id="main">
             <div class="user-list">
                 <div class="users">Users</div>
                 <div class="users-list" id="users-list"></div>
             </div>
             <div class="chat" id="chat">
-                <button type="button" class="button-show-more">Show more</button>
+                <div class="enter-message-container" id="input">
+                    <textarea id="text-area-enter" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                    <textarea id="text-area-enter2" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                    <textarea id="text-area-enter3" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                </div>
                 <div class="messages" id = "messages"></div>
-                <form method="post" action="Script.js" class="enter-message-container" id="input">
-                </form>
+                <button type="button" class="button-show-more" id="button-show-more">Show more</button>
+
+                <div class="header-private-chat" id="headerPrivateChat">
+                    <p class="name-private-chat" id="namePrivateChat"></p>
+                    <div class="button-return-to-chat" id="buttonReturnToChat">
+                        <p>Return to chat</p>
+                        <button>
+                            <span class="iconify" data-icon="uil:arrow-from-right" data-inline="false"></span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
-            <form method="post" action="Script.js" class="filter-container">
-                <input type="text" class="filter-name"  placeholder=" Enter name...">
-                <input type="text" class="filter-text" placeholder=" Enter text...">
-                <input type="date" class="filter-date"   placeholder=" Enter date...">
+
+            <form class="filter-container" id="filter-container">
+                <input type="text" class="filter-name" id="filter-name" placeholder=" Enter name...">
+                <input type="text" class="filter-text" id="filter-text" placeholder=" Enter text...">
+                <input type="date" class="filter-date" id="filter-date"  placeholder=" Enter date...">
                 <button type="submit" class="button-filter">Find</button>
             </form>
+
+            <div id="sign-up-container">
+                <div class="sign-up-container">
+                    <form  class="sign-up-body" id="formSignUp">
+                        <p id="sign-up">EduChat</p>
+                        <input type="text" class="sign-up" id="loginSignUp"  placeholder=" Login">
+                        <input type="password" class="sign-up" id="passwordSignUp" placeholder=" Password">
+                        <input type="password" class="sign-up" id="confirmPassword" placeholder=" Confirm password">
+
+                        <p class="errors" id="errors"></p>
+
+                        <button type="submit" class="button-sign-up">Sign up</button>
+                    </form>
+                    <button type="button" class="button-home" onclick="toMainPage()">
+                        <span class="iconify" data-icon="uil:home-alt" data-inline="false" style="color: #e9bcb7; font-size: 1.5rem;"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sign-log" id="log-in-container">
+                <div class="log-in-container">
+                    <form id="formLogIn" class="log-in-body">
+                        <p id="log-in">EduChat</p>
+                        <input type="text" class="log-in" value="" id="login" placeholder=" Login">
+                        <input type="password" class="log-in" id="password" placeholder=" Password">
+
+                        <p class="errorsLog" id="errorsLog"></p>
+
+                        <div class="buttons-log-in">
+                            <button type="submit" class="button-log-in">Log in</button>
+                            <button type="button" class="button-sign-up-2" id="buttonSignUp">Sign up</button>
+                        </div>
+                    </form>
+                    <button type="button" class="button-home" id="button-home" onclick="toMainPage()">
+                        <span class="iconify" data-icon="uil:home-alt" data-inline="false" style="color: #e9bcb7; font-size: 1.5rem;"></span>
+                    </button>
+                </div>
+            </div>
         </main>
         <footer>
             <span class="name-chat">EduChat 1.0</span>

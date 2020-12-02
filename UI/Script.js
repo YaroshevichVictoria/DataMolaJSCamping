@@ -1,4 +1,4 @@
-function formatDate(date = '') {
+function formatDate(date) {
     let dd = date.getDate();
     if (dd < 10) dd = `0${dd}`;
 
@@ -10,7 +10,9 @@ function formatDate(date = '') {
     return `${dd}/${mm}/${yy}`;
 }
 
-function formatTime(date = '') {
+function formatTime(date) {
+    const newDate = new Date(date);
+
     let hours = date.getHours();
     if (hours < 10) hours = `0${hours}`;
 
@@ -19,13 +21,12 @@ function formatTime(date = '') {
 
     return `${hours}:${min}`;
 }
-
 class Message {
     constructor(msg = { }) {
         this._id = msg.id || `${+new Date()}`;
         this.text = msg.text;
-        this._createdAt = msg.createdAt ? new Date(msg.createdAt) : new Date();
-        this._author = msg.author || messageList.user;
+        this._createdAt = msg.createdAt ? new Date(msg._createdAt) : new Date();
+        this._author = msg._author || chatController.messageList.user;
         this.isPersonal = msg.isPersonal ?? !!msg.to;
         this.to = msg.to;
     }
@@ -46,22 +47,24 @@ class Message {
 class MessageList {
     static _filterObj = {
         author: (message, author) => author && message.author.toLowerCase().includes(author.toLowerCase()),
-        text: (message, text) => text && message.text.toLowerCase().includes(text.toLowerCase),
+        text: (message, text) => text && message.text.toLowerCase().includes(text.toLowerCase()),
         dateTo: (message, dateTo) => dateTo && message.createdAt < new Date(dateTo),
         dateFrom: (message, dateFrom) => dateFrom && message.createdAt > new Date(dateFrom),
+        to: (message, to) => to,
     }
 
     static _validateObj = {
-        text: (message) => message.text && message.text.length <= 200,
+        text: (message) => message.text && message.text.length <= 200 && message.text.length > 0,
+        to: (message) => message.to && message.text.length > 0,
     }
 
     static _validateEditObj = {
         text: (message) => message.text && message.text.length <= 200,
-        to: (message) => message.to && message.to !== '',
+        to: (message) => message.to,
     }
 
     static validate(msg = {}) {
-        return Object.keys(this._validateObj).every((key) => this._validateObj[key](msg));
+        return Object.keys(this._validateObj).some((key) => this._validateObj[key](msg));
     }
 
     static validEditMessage(msg = {}) {
@@ -69,7 +72,7 @@ class MessageList {
     }
 
     constructor(msgs = []) {
-        this._arrMessages = msgs;
+        this.restore();
         this._notValidMessages = [];
     }
 
@@ -86,7 +89,8 @@ class MessageList {
         Object.keys(filterConfig).forEach((key) => {
             resultArr = resultArr.filter((message) => MessageList._filterObj[key](message, filterConfig[key]));
         });
-        resultArr = resultArr.filter((message) => message.author === this.user || message.isPersonal === false || message.to === this.user);
+        if (filterConfig.to) resultArr = resultArr.filter((message) => (message.author === this.user && message.to === filterConfig.to) || (message.author === filterConfig.to && message.to === this.user));
+        else resultArr = resultArr.filter((message) => message.isPersonal === false);
         resultArr.sort((d1, d2) => d1.createdAt - d2.createdAt);
         resultArr.splice(0, skip);
         if (resultArr.length > top) {
@@ -100,6 +104,7 @@ class MessageList {
             const message = new Message(msg);
             if (MessageList.validate(msg)) {
                 this._arrMessages.push(message);
+                this.save();
                 return true;
             } return false;
         } return false;
@@ -118,7 +123,9 @@ class MessageList {
                 }
                 if (msg.to) {
                     foundMessage.to = msg.to;
-                } return true;
+                }
+                this.save();
+                return true;
             } return false;
         } return false;
     }
@@ -128,6 +135,7 @@ class MessageList {
             const index = this._arrMessages.findIndex((message) => message.id === idNew && message.author === this.user);
             if (index !== -1) {
                 this._arrMessages.splice(index, 1);
+                this.save();
                 return true;
             } return false;
         } return false;
@@ -144,19 +152,51 @@ class MessageList {
     clear() {
         this._arrMessages.splice(0);
     }
+
+    save() {
+        const newArrMessages = chatController.messageList._arrMessages;
+        localStorage.setItem('messages', JSON.stringify(newArrMessages));
+    }
+
+    restore() {
+        let arr = JSON.parse(localStorage.getItem('messages'));
+        if (localStorage.getItem('messages')) {
+            arr = arr.map((message) => new Message(message));
+            this._arrMessages = [...arr];
+            if (this._arrMessages.length > 10) showMore.style.display = 'flex';
+        }
+    }
 }
 
 class UserList {
    constructor(users = [], activeUsers = []) {
-        this._users = users;
-        this.activeUsers = activeUsers;
+       this.restore();
+       this._activeUsers = activeUsers;
     }
 
     get users() {
        return this._users;
     }
-}
 
+    get activeUsers() {
+       return this._activeUsers;
+    }
+
+    addUser(user) {
+       chatController.userList.users.push(user);
+       chatController.messageList.save();
+       chatController.userList.save();
+    }
+
+    save() {
+        const newArrUsers = chatController.userList.users;
+        localStorage.setItem('users', JSON.stringify(newArrUsers));
+    }
+
+    restore() {
+        if (localStorage.getItem('users')) this._users = JSON.parse(localStorage.getItem('users'));
+    }
+}
 class HeaderView {
     constructor(containerId = '') {
         this.container = document.getElementById(containerId);
@@ -175,22 +215,28 @@ class MessagesView {
     }
 
     display(arr) {
-        this.container.innerHTML = arr.map((message) => (message._author === messageList.user
-                                    ? `<div class='my-message-container'>
-                                        <div class='my-message-author'>${message._author}:</div>
-                                        <div class='my-message-body'>
-                                            <div class='my-message-area'>
-                                                <div class='my-triangle'></div>
-                                                <div class='my-message-text'>
-                                                    <p><span>${message.text}</span>
-                                                    </p>
+        this.container.innerHTML = arr.map((message) => (message._author === chatController.messageList.user
+                                    ? `<div class='my-message-container'>                              
+                                            <div class='my-message-author'>${message._author}:</div>
+                                            <div class='my-message-body' id="my-message">
+                                                <div class='my-message-area' id="my-message-area">
+                                                    <div class='my-triangle'></div>
+                                                    <div class='my-message-text'>
+                                                        <p><span class="textMessage">${message.text}</span>
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="message-time-date">
-                                                <div class="message-time">${formatTime(message._createdAt)}</div>
-                                                <div class="message-date">${formatDate(message._createdAt)}</div>
-                                            </div>
-                                        </div>
+                                                <div class="message-time-date">
+                                                    <div class="message-time">${formatTime(message._createdAt)}</div>
+                                                    <div class="message-date">${formatDate(message._createdAt)}</div>
+                                                </div>
+                                                    <div class="buttons-delete-edit" id="buttons-delete-edit">
+                                             <button type="button" class="button-delete">Delete</button>
+                                             <button type="button" class="button-edit">Edit</button>
+                                      </div>   
+
+                                       
+                                       </div>  
                                     </div>`
                                     : `<div class='message-container'>
                                         <div class='message-author'>${message._author}:</div>
@@ -217,69 +263,383 @@ class UsersView {
     }
 
     display(arr) {
-        this.container.innerHTML = arr.map((user) => `<div class=${userList.activeUsers.includes(user) ? 'active-user' : 'user'}>
-                    <button type="button" class="button-private-messages">
-                        <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
-                    </button>
-                    <span>${user}</span>
-                </div>`).join('');
+        this.container.innerHTML = arr.map((user) => (chatController.userList.activeUsers.includes(user)
+                                                    ? `<div class='active-user'>
+                                                            <button type="button" class=${user === chatController.messageList.user ? 'my-button-private-messages' : 'button-private-messages'} id="button-private-messages">
+                                                                <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
+                                                            </button>
+                                                            <span id="name-private-user">${user}</span>
+                                                        </div>`
+                                                    : `<div class='user'>
+                                                            <button type="button" class='button-private-messages' id="button-private-messages">
+                                                                <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
+                                                            </button>
+                                                            <span id="name-private-user">${user}</span>
+                                                        </div>`)).join('');
     }
 }
 
-function setCurrentUser(user = '') {
-    headerView.display(user);
-    messageList.user = user;
-    if (messageList.user) {
-        document.getElementById('input').innerHTML = '<textarea id="text-area-enter" cols="102" rows="3" placeholder="  Press Enter to send the message."/>';
+class ChatController {
+    constructor() {
+        this.messageList = new MessageList();
+        this.userList = new UserList([], ['Yanina']);// добавила активного просто для наглядности, чтобы проверить, как работает приватный чат
+        this.headerView = new HeaderView('userNameId');
+        this.messagesView = new MessagesView('messages');
+        this.usersView = new UsersView('users-list');
+    }
+
+    setCurrentUser(user = '') {
+        this.headerView.display(user);
+        this.messageList.user = user;
+        document.getElementById('input').style.visibility = 'visible';
         document.getElementById('button-log-out').textContent = 'Log out';
     }
+
+    addMessage({ text, isPersonal = false, to = null }) {
+        if (!to && text.length > 1) {
+            if (this.messageList.add({ text, isPersonal })) this.messagesView.display(this.messageList.getPage());
+        }
+        if (to && text.length > 1) {
+            this.messageList.add({ text, isPersonal, to });
+            this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to }));
+        }
+    }
+
+    editMessage(id = `+${new Date()}`, { text = '', to = null }) {
+        if (this.messageList.edit(id, { text, to })) this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to }));
+    }
+
+    removeMessage(id = '') {
+        if (this.messageList.remove(id)) {
+            headerPrivate.style.display === 'flex'
+                ? this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to: namePrivateChat.textContent }))
+                : this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length));
+        }
+    }
+
+    showMessages(skip = 0, top = 10, filterConfig = {}) {
+        const arr = this.messageList.getPage(skip, top, filterConfig);
+        if (headerPrivate.style.display === 'none') {
+            if (this.messageList.getPage(0, this.messageList._arrMessages.length).length > 10) {
+                showMore.style.display = 'flex';
+            } else showMore.style.display = 'none';
+        }
+        this.messagesView.display(arr);
+    }
+
+    showUsers() {
+        this.usersView.display(this.userList.users);
+        this.messageList.save();
+        this.userList.save();
+    }
+
+    callBackFormLogIn() {
+        event.preventDefault();
+        const users = JSON.parse(localStorage.getItem('user'));
+        const foundUser = users.find((user) => user.loginSignUp === login.value);
+        if (foundUser) {
+            if (foundUser.passwordSignUp === password.value) {
+                logInContainer.style.display = 'none';
+                buttonLogOut.style.visibility = 'visible';
+                chatController.userList.activeUsers.push(login.value);
+                chatController.setCurrentUser(login.value);
+                chatController.showUsers();
+                chatController.showMessages();
+            }
+            if (password.value !== foundUser.passwordSignUp) {
+                error.textContent = 'Wrong password.';
+                password.style.border = '1px solid #ef786b';
+            }
+            if (password.value === '') {
+                error.textContent = 'Fill in all the fields.';
+                password.style.border = '1px solid #ef786b';
+            }
+        } else {
+            error.textContent = 'Login not registered.';
+            login.style.border = '1px solid #ef786b';
+        }
+    }
+
+    callBackFormSignUp() {
+        event.preventDefault();
+        const newLogin = document.getElementById('loginSignUp');
+        const newPassword = document.getElementById('passwordSignUp');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const users = JSON.parse(localStorage.getItem('user'));
+        let signUpArr = [];
+        if (localStorage.getItem('user')) {
+             signUpArr = [...users];
+        }
+
+        let signUpObj = {};
+        signUpObj = {
+            loginSignUp: newLogin.value,
+            passwordSignUp: newPassword.value,
+        };
+
+        signUpArr.push(signUpObj);
+
+        if (newPassword.value === confirmPassword.value && newPassword.value !== '') {
+            localStorage.setItem('user', JSON.stringify(signUpArr));
+            chatController.userList.addUser(newLogin.value);
+            chatController.showUsers();
+            login.value = newLogin.value;
+            logInContainer.style.display = 'flex';
+            signUpContainer.style.display = 'none';
+            login.value = newLogin.value;
+        }
+        if (newPassword.value === '' || confirmPassword.value === '' || newLogin.value === '') {
+            errorSignUp.textContent = 'Fill in all the fields.';
+        } else {
+            errorSignUp.textContent = 'Passwords do not match.';
+            confirmPassword.blur();
+            confirmPassword.style.border = '1px solid #ef786b';
+        }
+    }
 }
 
-function addMessage({ text = '', isPersonal = false, to = null }) {
-     if (!to) {
-         if (messageList.add({ text, isPersonal })) messagesView.display(messageList.getPage());
-     }
+const logInContainer = document.getElementById('log-in-container');
+const signUpContainer = document.getElementById('sign-up-container');
+const login = document.getElementById('login');
+const password = document.getElementById('password');
+const formToLogin = document.getElementById('formLogIn');
+const formToSignUp = document.getElementById('formSignUp');
+const error = document.getElementById('errorsLog');
+const errorSignUp = document.getElementById('errors');
+const buttonLogOut = document.getElementById('button-log-out');
+const buttonSignUp = document.getElementById('buttonSignUp');
+const logInOut = document.getElementById('button-log-out');
+const messagesBody = document.getElementById('messages');
+
+const headerPrivate = document.getElementById('headerPrivateChat');
+const namePrivateChat = document.getElementById('namePrivateChat');
+const buttonReturnToChat = document.getElementById('buttonReturnToChat');
+
+const userList = document.getElementById('users-list');
+
+const textArea = document.getElementById('text-area-enter');
+const textArea2 = document.getElementById('text-area-enter2');
+const textArea3 = document.getElementById('text-area-enter3');
+
+const showMore = document.getElementById('button-show-more');
+
+const filterContainer = document.getElementById('filter-container');
+
+let result;
+let myTop = 10;
+
+isEmptyLocalStorage();
+const chatController = new ChatController();
+
+chatController.showUsers();
+chatController.showMessages();
+
+function isEmptyLocalStorage() { // ???????????????????????
+    if (!localStorage.getItem('messages') && !localStorage.getItem('users')) {
+        const message4 = new Message({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: 'Victoria' });
+        const message5 = new Message({ text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'Yanina' });
+        const arr = [message4, message5];
+        localStorage.setItem('messages', JSON.stringify(arr));
+        localStorage.setItem('users', JSON.stringify(['Victoria', 'Yanina', 'Alex']));
+        localStorage.setItem('user', JSON.stringify([{ loginSignUp: 'Victoria', passwordSignUp: 'qwe' }, { loginSignUp: 'Yanina', passwordSignUp: 'qwe' }, { loginSignUp: 'Alex', passwordSignUp: 'qwe' }]));
+    }
+}
+function foo() {
+    const messages = document.querySelectorAll('.my-message-container');
+    const arr = [...messages];
+    let myMess;
+    const eventClick = event.target;
+    const container = eventClick.closest('.my-message-container');
+    if (headerPrivate.style.display === 'flex') {
+         myMess = chatController.messageList.getPage(0, chatController.messageList._arrMessages.length, {
+            author: chatController.messageList.user,
+            to: namePrivateChat.textContent,
+        });
+    } else {
+        myMess = chatController.messageList.getPage(0, chatController.messageList._arrMessages.length, {
+        author: chatController.messageList.user });
+    }
+    const index = arr.indexOf(container);
+    return myMess[index].id;
 }
 
-function editMessage(id = `+${new Date()}`, { text = '', to = '' }) {
-    if (messageList.edit(id, { text, to }))messagesView.display(messageList.getPage());
+function callBackMessageBody() {
+    const eventClick = event.target;
+    if (eventClick.className === 'my-message-text') {
+        const buttons = [...eventClick.closest('.my-message-body').children].find((el) => el.className === 'buttons-delete-edit');
+        buttons.style.visibility = 'visible';
+    }
+    if (eventClick.className === 'button-edit') {
+        const message = chatController.messageList.get(foo());
+        textArea.style.display = 'none';
+        textArea3.style.display = 'none';
+        textArea2.style.display = 'block';
+        textArea2.value = message.text;
+        result = message.id;
+    }
+    if (eventClick.className === 'button-delete') {
+        const container = eventClick.closest('#my-message');
+        eventClick.parentNode.style.display = 'none';
+        container.innerHTML += `<div class="button-confirm-delete">
+                                    <input id="button-confirm-delete" onchange="confirmDeleteMessage()" type="checkbox">
+                                        Delete
+                                </div>`;
+    }
 }
 
-function removeMessage(id = '') {
-    if (messageList.remove(id))messagesView.display(messageList.getPage());
+function scrollToEndPage() {
+    const endPage = [...document.querySelectorAll('.message-container'), ...document.querySelectorAll('.my-message-container')];
+    const size = endPage.length;
+    endPage[size - 1].scrollIntoView();
 }
 
-function showMessages(skip = 0, top = 10, filterConfig = {}) {
-    const arr = messageList.getPage(skip, top, filterConfig);
-    messagesView.display(arr);
+function checkedFilterValue(arr = []) {
+    const obj = {
+        author: arr[0],
+        text: arr[1],
+        dateFrom: arr[2],
+    };
+    for (const key in obj) {
+        if (!obj[key]) {
+            delete obj[key];
+        }
+    }
+    if (headerPrivate.style.display === 'flex') obj.to = namePrivateChat.textContent;
+    return obj;
 }
 
-function showUsers() {
-    usersView.display(userList.users);
+function formFilter() {
+    event.preventDefault();
+    const userName = document.getElementById('filter-name');
+    const textMessage = document.getElementById('filter-text');
+    const dateMessage = document.getElementById('filter-date');
+    const filters = checkedFilterValue([userName.value, textMessage.value, dateMessage.value]);
+    chatController.showMessages(0, chatController.messageList._arrMessages.length, filters);
+    showMore.style.display = 'none';
+    if (!chatController.messagesView.container.innerHTML) {
+        chatController.messagesView.container.innerHTML = '<p class="nothing-to-found">Nothing to found.</p>';
+    }
+    userName.value = '';
+    textMessage.value = '';
+    dateMessage.value = '';
 }
 
-const message1 = new Message({ id: 6, text: 'Lorem ipsum', createdAt: '2020-10-09T13:05:00', author: 'Yanina Chirko' });
-const message3 = new Message({ id: 15, text: 'ipsum', createdAt: '2020-10-13T19:05:00', author: 'Polina Skoraya' });
-const message2 = new Message({ text: 'dolor sit amet', author: 'Victoria Yaroshevich' });
-const message4 = new Message({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: 'Alexey Yaroshevich' });
-const message5 = new Message({ text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'Anastasia Ostashenko' });
-const message6 = new Message({ id: 10, text: 'Vivamus elementum semper nisi', author: 'Victoria Yaroshevich' });
+function callBackPrivateMessages() {
+    const eventClick = event.target;
+    if (chatController.messageList.user && (eventClick.tagName === 'svg' || eventClick.tagName === 'path')) {
+        const activeUser = eventClick.closest('.active-user').lastElementChild.textContent;
+        chatController.showMessages(0, chatController.messageList._arrMessages.length, { to: activeUser });
+        showMore.style.display = 'none';
+        headerPrivate.style.display = 'flex';
+        namePrivateChat.textContent = activeUser;
+        textArea3.style.display = 'flex';
+        textArea.style.display = 'none';
+    }
+}
 
-const messageList = new MessageList([message1, message2, message3, message4, message5, message6]);
-const userList = new UserList(['Yanina Chirko', 'Polina Skoraya', 'Alexey Yaroshevich', 'Victoria Yaroshevich', 'Alexander Averin', 'Anastasia Ostashenko'],
-    ['Victoria Yaroshevich', 'Yanina Chirko', 'Alexander Averin', 'Anastasia Ostashenko']);
-const headerView = new HeaderView('userNameId');
-const messagesView = new MessagesView('messages');
-const usersView = new UsersView('users-list');
+function callBackEditMess() {
+    if (event.which === 13 && !event.shiftKey) {
+        chatController.editMessage(result, { text: textArea2.value });
+        headerPrivate.style.display === 'flex'
+            ? chatController.showMessages(0, chatController.messageList._arrMessages.length, { to: namePrivateChat.textContent })
+            : chatController.showMessages(0, chatController.messageList._arrMessages.length);
+        scrollToEndPage();
+        showMore.style.display = 'none';
+        textArea2.style.display = 'none';
+        textArea.style.display = 'block';
+    }
+}
 
-setCurrentUser('Victoria Yaroshevich');
+function callBackShowMore() {
+    if (chatController.messageList._arrMessages.length > 0) {
+        myTop += 10;
+        chatController.showMessages(0, myTop);
+        scrollToEndPage();
+        if (chatController.messageList._arrMessages.length - myTop < 0) {
+            showMore.style.display = 'none';
+        }
+    }
+}
 
-addMessage({ text: 'Vivamus elemlkmlmentum' });
+function addPrivateMessages() {
+    if (event.which === 13 && !event.shiftKey) {
+        chatController.addMessage({ text: textArea3.value, isPersonal: true, to: namePrivateChat.textContent });
+        textArea3.value = '';
+        scrollToEndPage();
+    }
+}
+function returnToChat() {
+    headerPrivate.style.display = 'none';
+    textArea3.style.display = 'none';
+    textArea.style.display = 'flex';
+    chatController.showMessages();
+    scrollToEndPage();
+}
 
-editMessage(10, { text: 'hahahahaha' });
+function addMessages() {
+    if (event.which === 13 && !event.shiftKey) {
+        chatController.addMessage({ text: textArea.value });
+        textArea.value = '';
+        chatController.showMessages(0, chatController.messageList._arrMessages.length);
+        showMore.style.display = 'none';
+        scrollToEndPage();
+    }
+}
 
-removeMessage(10);
+function confirmDeleteMessage() {
+        chatController.removeMessage(foo());
+}
 
-showMessages(0, 10, { dateFrom: '2020-10-09T11:00:00', dateTo: '2020-10-13T13:06:00' });
+function clickButtonSignUp() {
+    logInContainer.style.display = 'none';
+    signUpContainer.style.display = 'flex';
+    buttonLogOut.style.visibility = 'hidden';
+}
 
-showUsers();
+function toMainPage() {
+    logInContainer.style.display = 'none';
+    signUpContainer.style.display = 'none';
+    buttonLogOut.style.visibility = 'visible';
+}
+
+function buttonLogOutIn() {
+    if (logInOut.textContent === 'Log out') {
+        event.preventDefault();
+        const index = chatController.userList.activeUsers.indexOf(chatController.messageList.user);
+        chatController.userList.activeUsers.splice(index, 1);
+        chatController.setCurrentUser('');
+        document.getElementById('userNameId').innerText = '';
+        logInOut.textContent = 'Log in';
+        chatController.showMessages();
+        chatController.showUsers();
+        document.getElementById('input').style.visibility = 'hidden';
+        headerPrivate.style.display = 'none';
+    } else {
+        event.preventDefault();
+        logInContainer.style.display = 'flex';
+    }
+}
+
+textArea.addEventListener('keyup', addMessages);
+
+textArea2.addEventListener('keyup', callBackEditMess);
+
+userList.addEventListener('click', callBackPrivateMessages);
+
+textArea3.addEventListener('keyup', addPrivateMessages);
+
+buttonReturnToChat.addEventListener('click', returnToChat);
+
+formToLogin.addEventListener('submit', chatController.callBackFormLogIn);
+
+formToSignUp.addEventListener('submit', chatController.callBackFormSignUp);
+
+filterContainer.addEventListener('submit', formFilter);
+
+buttonSignUp.addEventListener('click', clickButtonSignUp);
+
+logInOut.addEventListener('click', buttonLogOutIn);
+
+showMore.addEventListener('click', callBackShowMore);
+
+messagesBody.addEventListener('click', callBackMessageBody);

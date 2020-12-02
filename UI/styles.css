@@ -1,7 +1,3 @@
-@font-face{
-@import url('https://fonts.googleapis.com/css2?family=Advent+Pro:wght@500&family=Roboto:wght@400;500;700&display=swap');
-    font-family: 'Advent Pro','Roboto', sans-serif;
-}
 @media only screen and (max-width: 1960px) {
     header{
         padding-left: 25%;
@@ -227,6 +223,128 @@ header{
     border-radius: 0.5rem;
     border-width: 0;
 }
+
+
+#log-in-container, #sign-up-container {
+    display: none;
+    justify-content: center;
+    position: fixed;
+    height: 100%;
+    left:0;
+    right:0;
+    padding-top: 3rem;
+    background: rgba(31, 31, 31, 0.9);
+}
+.log-in-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 22rem;
+    height: 15rem;
+    background-color: #10100F;
+    z-index: 100;
+}
+.sign-up-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 22rem;
+    height: 17rem;
+    background-color: #10100F;
+    z-index: 100;
+}
+.button-home {
+    height: 2rem;
+    background-color: #10100F;
+    border: none;
+    margin-right: 0.3rem;
+    margin-left: auto;
+    margin-top: auto;
+}
+.sign-up, .log-in {
+    display: flex;
+    flex-direction: row;
+    height: 1.9rem;
+    width: 16rem;
+    padding-left: 0.2rem;
+    margin-bottom: 0.7rem;
+    color: #F3BDB6;
+    background-color: #1B1A1A;
+    border-radius: 0.5rem;
+    border-width: 0;
+}
+.sign-up-body, .log-in-body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.sign-up-body #sign-up, .log-in-body #log-in {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-family: 'Advent Pro', sans-serif;
+    font-size: 1.8rem;
+    color: #e9bcb7;
+    text-align: center;
+}
+.buttons-log-in {
+    display: flex;
+    margin-top: 0.2rem;
+}
+.button-sign-up{
+    width: 5rem;
+    height: 1.8rem;
+    padding-top: 0.13rem;
+    font-weight: bold;
+    color: #0a0a0a;
+    background-color: #c89f9a;
+    border-radius: 0.5rem;
+    border: none;
+}
+.button-sign-up-2{
+    width: 5rem;
+    height: 1.8rem;
+    padding-top: 0.13rem;
+    font-weight: bold;
+    color: #0a0a0a;
+    background-color: #805f59;
+    border-radius: 0.5rem;
+    border: none;
+}
+.button-log-in{
+    width: 5rem;
+    height: 1.8rem;
+    margin-right: 0.3rem;
+    padding-top: 0.13rem;
+    font-weight: bold;
+    color: #0a0a0a;
+    background-color: #c89f9a;
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.errors {
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    color: #ef786b;
+}
+.errorsLog {
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    color: #ef786b;
+}
+.sign-up::-webkit-input-placeholder, .log-in::-webkit-input-placeholder{
+    text-align: center;
+    color: rgba(236, 182, 175, 0.58);
+}
+
+
+
+
+
 /*---------------------MAIN--------------------------------*/
 main{
     display: flex;
@@ -287,7 +405,8 @@ main{
 .user-me .button-private-messages{
     visibility: hidden;
 }
-.button-private-messages{
+
+.button-private-messages ,.my-button-private-messages{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -298,23 +417,27 @@ main{
     border-radius: 1rem;
     background-color: #BA8F89;
 }
+.my-button-private-messages {
+    visibility: hidden;
+}
 .user .button-private-messages{
     visibility: hidden;
 }
 .button-private-messages .iconify{
     height: 1.3rem;
     width: 1.3rem;
-
 }
 /*-----CHAT-----*/
 .chat{
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: center;
     padding-bottom: 0.5rem;
     background-color: #272525;
 }
 .button-show-more{
+    display: none;
+    justify-content: center;
     height: 1.1rem;
     width: 6rem;
     margin-top: 0.1rem;
@@ -374,11 +497,40 @@ main{
 }
 .my-message-container{
     display: grid;
-    grid-template-rows: 1rem minmax(2rem, auto);
-    width: 70%;
+    grid-template-rows: 1rem minmax(2rem, auto) 1rem;
+    width: 80%;
     justify-items: end;
     margin-left: auto;
     margin-bottom: 1rem;
+}
+.buttons-delete-edit {
+    display: flex;
+    flex-direction: row;
+    visibility: hidden;
+}
+.button-delete, .button-edit {
+    height: 1.5rem;
+    width: 4rem;
+    margin-top: 0.1rem;
+    text-align: center;
+    color: #F3BDB6;
+    background-color: #000000;
+    border-radius: 0.5rem;
+    border-width: 0;
+}
+.button-confirm-delete {
+    display: flex;
+    height: 1.5rem;
+    width: 5rem;
+    justify-content: center;
+    align-items: center;
+    color: #F3BDB6;
+    background-color: #000000;
+    border-radius: 0.5rem;
+    border-width: 0;
+}
+.button-confirm-delete input{
+    margin-right: 0.3rem;
 }
 .my-message-author{
     text-align: right;
@@ -388,6 +540,7 @@ main{
 .my-message-body{
     display: flex;
     flex-direction: row-reverse;
+    justify-content: flex-start;
     align-items: center;
 }
 .my-message-area{
@@ -408,13 +561,18 @@ main{
     border-radius: 1.4rem 0 1.4rem 1.4rem;
     border: none;
 }
-
 .enter-message-container{
     height: 3.8rem;
     width: 98.2%;
     margin-top: auto;
 }
-#text-area-enter{
+#input {
+    visibility: hidden;
+}
+#text-area-enter2, #text-area-enter3 {
+    display: none;
+}
+#text-area-enter, #text-area-enter2, #text-area-enter3{
     height: 3.8rem;
     width: 100%;
     color: #A3A1A1;
@@ -422,10 +580,48 @@ main{
     border-width: 0;
     border-radius: 0.5rem;
 }
-#text-area-enter::-webkit-input-placeholder{
+#text-area-enter::-webkit-input-placeholder, #text-area-enter2::-webkit-input-placeholder, #text-area-enter3::-webkit-input-placeholder{
     color: #585656;
 }
+
+#headerPrivateChat {
+    display: none;
+    justify-content: space-between;
+    width: 100%;
+    background-color: #1a1a1a;
+}
+.button-return-to-chat {
+    display: flex;
+    align-items: center;
+    margin-right: 0.3rem;
+}
+.button-return-to-chat button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.3rem;
+    width: 1.3rem;
+    background-color: #BA8F89;
+    border-radius: 0.5rem;
+    border: none;
+}
+.name-private-chat {
+    margin-left: 0.6rem;
+    color: #F3BDB6;
+}
+.button-return-to-chat p {
+    margin-right: 0.8rem;
+    font-size: 0.8rem;
+    color: #BA8F89;
+}
+
 /*----FILTER----*/
+.nothing-to-found {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-top: 18rem;
+    color: #8a8888;
+}
 .filter-container{
     background-color: #10100F;
 }
@@ -492,13 +688,19 @@ footer{
     color: #e9bcb7;
     background-color: #131313;
 }
-
 .button-private-messages:hover{
     background-color: #F8CAC5;
 }
-.button-filter:hover{
-    background-color: #ECB6AF;
+.button-filter:hover, .button-sign-up:hover, .button-log-in:hover{
+    background-color: #f1bfb8;
 }
+.button-sign-up-2:hover {
+    background-color: #987673;
+}
+.button-return-to-chat button:hover {
+    background-color: #e9bcb7;
+}
+
 /*--------------------SCROLL--------------------------------*/
 ::-webkit-scrollbar-track {
     background-color: #2C2C2B;
