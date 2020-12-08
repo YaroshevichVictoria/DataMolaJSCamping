@@ -1,11 +1,13 @@
 function formatDate(date) {
-    let dd = date.getDate();
+    const newDate = new Date(date);
+
+    let dd = newDate.getDate();
     if (dd < 10) dd = `0${dd}`;
 
-    let mm = date.getMonth() + 1;
+    let mm = newDate.getMonth() + 1;
     if (mm < 10) mm = `0${mm}`;
 
-    const yy = date.getFullYear();
+    const yy = newDate.getFullYear();
 
     return `${dd}/${mm}/${yy}`;
 }
@@ -13,20 +15,21 @@ function formatDate(date) {
 function formatTime(date) {
     const newDate = new Date(date);
 
-    let hours = date.getHours();
+    let hours = newDate.getHours();
     if (hours < 10) hours = `0${hours}`;
 
-    let min = date.getMinutes() + 1;
+    let min = newDate.getMinutes();
     if (min < 10) min = `0${min}`;
 
     return `${hours}:${min}`;
 }
+
 class Message {
     constructor(msg = { }) {
         this._id = msg.id || `${+new Date()}`;
         this.text = msg.text;
-        this._createdAt = msg.createdAt ? new Date(msg._createdAt) : new Date();
-        this._author = msg._author || chatController.messageList.user;
+        this._createdAt = msg.createdAt ? new Date(msg.createdAt) : new Date();
+        this._author = msg.author;
         this.isPersonal = msg.isPersonal ?? !!msg.to;
         this.to = msg.to;
     }
@@ -72,7 +75,8 @@ class MessageList {
     }
 
     constructor(msgs = []) {
-        this.restore();
+        // this.restore();
+        this._arrMessages = msgs;
         this._notValidMessages = [];
     }
 
@@ -112,6 +116,7 @@ class MessageList {
 
     get(id = '') {
         return this._arrMessages.find((message) => message.id === id);
+        // return this._arrMessages.find((message) => message.id === id);
     }
 
     edit(idNew, msg = { text: '', to: null }) {
@@ -146,7 +151,7 @@ class MessageList {
             const mess = new Message(message);
             MessageList.validate(mess) ? this._arrMessages.push(mess) : this._notValidMessages.push(mess);
         });
-        return this._notValidMessages;
+        return this._arrMessages;
     }
 
     clear() {
@@ -157,20 +162,21 @@ class MessageList {
         const newArrMessages = chatController.messageList._arrMessages;
         localStorage.setItem('messages', JSON.stringify(newArrMessages));
     }
-
-    restore() {
-        let arr = JSON.parse(localStorage.getItem('messages'));
-        if (localStorage.getItem('messages')) {
-            arr = arr.map((message) => new Message(message));
-            this._arrMessages = [...arr];
-            if (this._arrMessages.length > 10) showMore.style.display = 'flex';
-        }
-    }
+    //
+    // restore() {
+    //     let arr = JSON.parse(localStorage.getItem('messages'));
+    //     if (localStorage.getItem('messages')) {
+    //         arr = arr.map((message) => new Message(message));
+    //         this._arrMessages = [...arr];
+    //         if (this._arrMessages.length > 10) showMore.style.display = 'flex';
+    //     }
+    // }
 }
 
 class UserList {
    constructor(users = [], activeUsers = []) {
-       this.restore();
+       this._users = users;
+       // this.restore();
        this._activeUsers = activeUsers;
     }
 
@@ -193,19 +199,18 @@ class UserList {
         localStorage.setItem('users', JSON.stringify(newArrUsers));
     }
 
-    restore() {
-        if (localStorage.getItem('users')) this._users = JSON.parse(localStorage.getItem('users'));
-    }
+    // restore() {
+    //     if (localStorage.getItem('users')) this._users = JSON.parse(localStorage.getItem('users'));
+    // }
 }
+
 class HeaderView {
     constructor(containerId = '') {
         this.container = document.getElementById(containerId);
     }
 
     display(currentUser) {
-        if (currentUser) {
             this.container.textContent = currentUser;
-        }
     }
 }
 
@@ -215,9 +220,9 @@ class MessagesView {
     }
 
     display(arr) {
-        this.container.innerHTML = arr.map((message) => (message._author === chatController.messageList.user
+        this.container.innerHTML = arr.map((message) => (message.author === userNameHeader
                                     ? `<div class='my-message-container'>                              
-                                            <div class='my-message-author'>${message._author}:</div>
+                                            <div class='my-message-author'>${message.author}:</div>
                                             <div class='my-message-body' id="my-message">
                                                 <div class='my-message-area' id="my-message-area">
                                                     <div class='my-triangle'></div>
@@ -227,8 +232,8 @@ class MessagesView {
                                                     </div>
                                                 </div>
                                                 <div class="message-time-date">
-                                                    <div class="message-time">${formatTime(message._createdAt)}</div>
-                                                    <div class="message-date">${formatDate(message._createdAt)}</div>
+                                                    <div class="message-time">${formatTime(message.createdAt)}</div>
+                                                    <div class="message-date">${formatDate(message.createdAt)}</div>
                                                 </div>
                                                     <div class="buttons-delete-edit" id="buttons-delete-edit">
                                              <button type="button" class="button-delete">Delete</button>
@@ -239,7 +244,7 @@ class MessagesView {
                                        </div>  
                                     </div>`
                                     : `<div class='message-container'>
-                                        <div class='message-author'>${message._author}:</div>
+                                        <div class='message-author'>${message.author}:</div>
                                         <div class='message-body'>
                                             <div class='message-area'>
                                                 <div class='triangle'></div>
@@ -249,8 +254,8 @@ class MessagesView {
                                                 </div>
                                             </div>
                                             <div class="message-time-date">
-                                                <div class="message-time">${formatTime(message._createdAt)}</div>
-                                                <div class="message-date">${formatDate(message._createdAt)}</div>
+                                                <div class="message-time">${formatTime(message.createdAt)}</div>
+                                                <div class="message-date">${formatDate(message.createdAt)}</div>
                                             </div>
                                         </div>
                                     </div>`)).join('');
@@ -263,26 +268,149 @@ class UsersView {
     }
 
     display(arr) {
-        this.container.innerHTML = arr.map((user) => (chatController.userList.activeUsers.includes(user)
+        this.container.innerHTML = arr.map((user) => (user.isActive
                                                     ? `<div class='active-user'>
-                                                            <button type="button" class=${user === chatController.messageList.user ? 'my-button-private-messages' : 'button-private-messages'} id="button-private-messages">
+                                                            <button type="button" class=${user === userNameHeader ? 'my-button-private-messages' : 'button-private-messages'} id="button-private-messages">
                                                                 <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
                                                             </button>
-                                                            <span id="name-private-user">${user}</span>
+                                                            <span id="name-private-user">${user.name}</span>
                                                         </div>`
                                                     : `<div class='user'>
                                                             <button type="button" class='button-private-messages' id="button-private-messages">
                                                                 <span class="iconify" data-icon="eva:paper-plane-fill" data-inline="false"/>
                                                             </button>
-                                                            <span id="name-private-user">${user}</span>
+                                                            <span id="name-private-user">${user.name}</span>
                                                         </div>`)).join('');
     }
 }
 
+class ChatApiService {
+    constructor(url) {
+        this._url = url;
+    }
+
+    async _fetchRequest(url, options = {}) {
+        const requestOptions = {
+            method: options.method,
+            headers: options.headers,
+            body: options.body,
+            redirect: 'follow',
+        };
+
+        try {
+            return await fetch(`${this._url}/${url}`, requestOptions);
+        } catch (e) {
+            errorPage.style.display = 'flex';
+            logo.style.display = 'none';
+            buttonLogOut.style.display = 'none';
+            chatController.setCurrentUser('');
+            mainPage.style.display = 'none';
+            errorButton.addEventListener('click', errorToHome);
+        }
+    }
+
+    async _fetchLogReg(url, form) {
+        const requestOptions = {
+            method: 'POST',
+            body: form,
+            redirect: 'follow',
+        };
+
+        const response = await fetch(`${this._url}/auth/${url}`, requestOptions);
+        if (!response.ok) {
+            throw new Error('error');
+        } else return response.text();
+    }
+
+    async register(name, pass) {
+        const formdata = new FormData();
+        formdata.append('name', name);
+        formdata.append('pass', pass);
+
+        return this._fetchLogReg('register', formdata);
+    }
+
+    async login(name, pass) {
+        const formdata = new FormData();
+        formdata.append('name', name);
+        formdata.append('pass', pass);
+
+        return this._fetchLogReg('login', formdata);
+    }
+
+    async logout() {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', chatController.token].join(''));
+
+        return this._fetchRequest('auth/logout', { method: 'POST', headers: myHeaders });
+    }
+
+    async getUsers() {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', chatController.token].join(''));
+
+        const response = await this._fetchRequest('users', { method: 'GET', headers: myHeaders });
+        return response.text();
+    }
+
+    async getMessages(skip = 0, top = 10, filterConfig = {}, token) {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', token].join(''));
+
+        const arr = [];
+        arr.push(`skip=${skip}&top=${top}`);
+
+        for (const el in filterConfig) {
+            arr.push(`&${el}=${filterConfig[el]}`);
+        }
+
+        const response = await this._fetchRequest(`messages?${arr.join('')}`, { method: 'GET', headers: myHeaders });
+        return response.text();
+    }
+
+    async deleteMessages(id = '') {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', chatController.token].join(''));
+
+        return this._fetchRequest(`messages/${id}`, { method: 'DELETE', headers: myHeaders });
+    }
+
+    async postMessages(msg = {}) {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', chatController.token].join(''));
+        myHeaders.append('Content-Type', 'application/json');
+
+        let raw;
+        msg.to ? raw = JSON.stringify({ text: msg.text, isPersonal: true, author: msg.author, to: msg.to })
+               : raw = JSON.stringify({ text: msg.text, isPersonal: false, author: msg.author });
+
+        return this._fetchRequest('messages', { method: 'POST', headers: myHeaders, body: raw });
+    }
+
+    async putMessages(id = '', msg = {}) {
+        const myHeaders = new Headers();
+        myHeaders.append('Authorization', ['Bearer ', chatController.token].join(''));
+        myHeaders.append('Content-Type', 'application/json');
+
+        let raw;
+        msg.to ? raw = JSON.stringify({ text: msg.text, isPersonal: true, to: msg.to })
+               : raw = JSON.stringify({ text: msg.text, isPersonal: false });
+
+        return this._fetchRequest(`messages/${id}`, { method: 'PUT', headers: myHeaders, body: raw });
+    }
+}
+
+const showMore = document.getElementById('button-show-more');
+const headerPrivate = document.getElementById('headerPrivateChat');
+let myTop = 10;
+let buttonIsHidden = false;
+
 class ChatController {
+    token;
+
+    _size;
+
     constructor() {
-        this.messageList = new MessageList();
-        this.userList = new UserList([], ['Yanina']);// добавила активного просто для наглядности, чтобы проверить, как работает приватный чат
         this.headerView = new HeaderView('userNameId');
         this.messagesView = new MessagesView('messages');
         this.usersView = new UsersView('users-list');
@@ -290,114 +418,139 @@ class ChatController {
 
     setCurrentUser(user = '') {
         this.headerView.display(user);
-        this.messageList.user = user;
         document.getElementById('input').style.visibility = 'visible';
         document.getElementById('button-log-out').textContent = 'Log out';
     }
 
-    addMessage({ text, isPersonal = false, to = null }) {
-        if (!to && text.length > 1) {
-            if (this.messageList.add({ text, isPersonal })) this.messagesView.display(this.messageList.getPage());
-        }
-        if (to && text.length > 1) {
-            this.messageList.add({ text, isPersonal, to });
-            this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to }));
-        }
-    }
-
-    editMessage(id = `+${new Date()}`, { text = '', to = null }) {
-        if (this.messageList.edit(id, { text, to })) this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to }));
-    }
-
-    removeMessage(id = '') {
-        if (this.messageList.remove(id)) {
-            headerPrivate.style.display === 'flex'
-                ? this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length, { to: namePrivateChat.textContent }))
-                : this.messagesView.display(this.messageList.getPage(0, this.messageList._arrMessages.length));
-        }
-    }
-
-    showMessages(skip = 0, top = 10, filterConfig = {}) {
-        const arr = this.messageList.getPage(skip, top, filterConfig);
-        if (headerPrivate.style.display === 'none') {
-            if (this.messageList.getPage(0, this.messageList._arrMessages.length).length > 10) {
-                showMore.style.display = 'flex';
-            } else showMore.style.display = 'none';
-        }
-        this.messagesView.display(arr);
-    }
-
-    showUsers() {
-        this.usersView.display(this.userList.users);
-        this.messageList.save();
-        this.userList.save();
-    }
-
-    callBackFormLogIn() {
-        event.preventDefault();
-        const users = JSON.parse(localStorage.getItem('user'));
-        const foundUser = users.find((user) => user.loginSignUp === login.value);
-        if (foundUser) {
-            if (foundUser.passwordSignUp === password.value) {
-                logInContainer.style.display = 'none';
-                buttonLogOut.style.visibility = 'visible';
-                chatController.userList.activeUsers.push(login.value);
-                chatController.setCurrentUser(login.value);
-                chatController.showUsers();
-                chatController.showMessages();
-            }
-            if (password.value !== foundUser.passwordSignUp) {
-                error.textContent = 'Wrong password.';
-                password.style.border = '1px solid #ef786b';
-            }
-            if (password.value === '') {
-                error.textContent = 'Fill in all the fields.';
-                password.style.border = '1px solid #ef786b';
+    async addMessage(msg = {}) {
+        if (!msg.to) {
+            const response = await chatApiService.postMessages({ text: msg.text, author: msg.author, isPersonal: false });
+            if (response.ok) {
+                await chatController.showMessages(0, 1000, { isPersonal: false }, 2000);
             }
         } else {
-            error.textContent = 'Login not registered.';
-            login.style.border = '1px solid #ef786b';
+            const response = await chatApiService.postMessages({ text: msg.text, author: msg.author, isPersonal: true, to: msg.to });
+            if (response.ok) {
+                    await chatController.showMessages(0, 1000, { isPersonal: true, personalToFrom: msg.to }, 2000);
+                }
         }
     }
 
-    callBackFormSignUp() {
+    async editMessage(id = '', msg = {}) {
+        if (!msg.to) {
+            const response = await chatApiService.putMessages(id, { text: msg.text });
+            if (response.ok) {
+                await chatController.showMessages(0, 1000, { isPersonal: false }, 2000);
+            }
+        } else {
+            const response = await chatApiService.putMessages({ text: msg.text, author: msg.author, isPersonal: true, to: msg.to });
+            if (response.ok) {
+                await chatController.showMessages(0, 1000, { isPersonal: true, personalToFrom: msg.to }, 2000);
+            }
+        }
+    }
+
+    async removeMessage(id = '') {
+        const response = await chatApiService.deleteMessages(id);
+        if (response.ok) {
+            headerPrivate.style.display === 'flex'
+                ? await chatController.showMessages(0, 1000, { isPersonal: true, personalToFrom: currentUserPrivate }, 2000)
+                : await chatController.showMessages(0, 1000, { isPersonal: false }, 2000);
+        }
+    }
+
+    async _fetchMessages(skip, top, filterConfig) {
+        let response;
+        headerPrivate.style.display === 'flex'
+            ? response = await chatApiService.getMessages(skip, top, filterConfig, chatController.token)
+            : response = await chatApiService.getMessages(skip, top, filterConfig);
+        this.messagesView.display((JSON.parse(response)).reverse());
+        this._size = (JSON.parse(response)).length;
+    }
+
+    async _fetchUsers() {
+        const response = await chatApiService.getUsers();
+        this.usersView.display(JSON.parse(response));
+    }
+
+    async showMessages(skip = 0, top = 10, filterConfig = {}, time = 70000) {
+        setTimeout(() => this._fetchMessages(skip, top, filterConfig), time);
+
+        scrollToEndPage();
+
+        if (this._size <= 10 || !buttonIsHidden) {
+            showMore.style.display = 'flex';
+        } else showMore.style.display = 'none';
+        if (headerPrivate.style.display === 'flex') showMore.style.display = 'none';
+    }
+
+    async showUsers(time = 70000) {
+        setInterval(() => this._fetchUsers(), time);
+    }
+
+    async callBackFormLogIn() {
+        event.preventDefault();
+        try {
+            await chatApiService.login(login.value, password.value)
+                .then((result) => {
+                    chatController.token = JSON.parse(result).token;
+                    logInContainer.style.display = 'none';
+                    buttonLogOut.style.visibility = 'visible';
+                    chatController.showUsers();
+                    myTop = 10;
+                    chatController.setCurrentUser(login.value);
+                    chatController.showMessages(0, 10, {}, 2000);
+                    userNameHeader = login.value;
+                });
+        } catch (err) {
+            if (login.value === '' || password.value === '') {
+                error.textContent = 'Fill in all the fields.';
+            } else {
+                const response = await chatApiService.getUsers();
+                const users = JSON.parse(response);
+                users.find((user) => user.name === login.value) ? error.textContent = 'Wrong password.'
+                    : error.textContent = 'Wrong login.';
+            }
+        }
+    }
+
+    async callBackFormSignUp() {
         event.preventDefault();
         const newLogin = document.getElementById('loginSignUp');
         const newPassword = document.getElementById('passwordSignUp');
         const confirmPassword = document.getElementById('confirmPassword');
-        const users = JSON.parse(localStorage.getItem('user'));
-        let signUpArr = [];
-        if (localStorage.getItem('user')) {
-             signUpArr = [...users];
-        }
-
-        let signUpObj = {};
-        signUpObj = {
-            loginSignUp: newLogin.value,
-            passwordSignUp: newPassword.value,
-        };
-
-        signUpArr.push(signUpObj);
-
-        if (newPassword.value === confirmPassword.value && newPassword.value !== '') {
-            localStorage.setItem('user', JSON.stringify(signUpArr));
-            chatController.userList.addUser(newLogin.value);
-            chatController.showUsers();
-            login.value = newLogin.value;
-            logInContainer.style.display = 'flex';
-            signUpContainer.style.display = 'none';
-            login.value = newLogin.value;
-        }
-        if (newPassword.value === '' || confirmPassword.value === '' || newLogin.value === '') {
-            errorSignUp.textContent = 'Fill in all the fields.';
-        } else {
-            errorSignUp.textContent = 'Passwords do not match.';
-            confirmPassword.blur();
-            confirmPassword.style.border = '1px solid #ef786b';
-        }
+        try {
+            if (newPassword.value === confirmPassword.value && newPassword.value !== '') {
+                await chatApiService.register(newLogin.value, newPassword.value)
+                    .then(() => {
+                        if (newPassword.value === confirmPassword.value && newPassword.value !== '') {
+                            login.value = newLogin.value;
+                            logInContainer.style.display = 'flex';
+                            signUpContainer.style.display = 'none';
+                            login.value = newLogin.value;
+                        }
+                    });
+            } else {
+                confirmPassword.value === ''
+                    ? errorSignUp.textContent = 'Fill in all the fields.'
+                    : errorSignUp.textContent = 'Passwords do not match.';
+                confirmPassword.blur();
+                confirmPassword.style.border = '1px solid #ef786b';
+            }
+        } catch (error) {
+            console.log(error);
+                    errorSignUp.textContent = 'Login already exists.';
+            }
     }
 }
 
+const chatController = new ChatController();
+const chatApiService = new ChatApiService('https://jslabdb.datamola.com');
+
+chatController.showUsers(2000);
+chatController.showMessages(0, 10, {}, 2000);
+
+const mainPage = document.getElementById('main');
 const logInContainer = document.getElementById('log-in-container');
 const signUpContainer = document.getElementById('sign-up-container');
 const login = document.getElementById('login');
@@ -407,75 +560,62 @@ const formToSignUp = document.getElementById('formSignUp');
 const error = document.getElementById('errorsLog');
 const errorSignUp = document.getElementById('errors');
 const buttonLogOut = document.getElementById('button-log-out');
+const logo = document.getElementById('logo');
 const buttonSignUp = document.getElementById('buttonSignUp');
 const logInOut = document.getElementById('button-log-out');
 const messagesBody = document.getElementById('messages');
 
-const headerPrivate = document.getElementById('headerPrivateChat');
 const namePrivateChat = document.getElementById('namePrivateChat');
 const buttonReturnToChat = document.getElementById('buttonReturnToChat');
 
 const userList = document.getElementById('users-list');
 
+const enterMessage = document.getElementById('formTextArea');
+const buttonEnterMessage = document.getElementById('submitTextArea');
 const textArea = document.getElementById('text-area-enter');
 const textArea2 = document.getElementById('text-area-enter2');
-const textArea3 = document.getElementById('text-area-enter3');
-
-const showMore = document.getElementById('button-show-more');
 
 const filterContainer = document.getElementById('filter-container');
 
+const errorButton = document.getElementById('errorButton');
+const errorPage = document.getElementById('errorContainer');
+
+let currentUserPrivate;
+let userNameHeader;
 let result;
-let myTop = 10;
 
-isEmptyLocalStorage();
-const chatController = new ChatController();
-
-chatController.showUsers();
-chatController.showMessages();
-
-function isEmptyLocalStorage() { // ???????????????????????
-    if (!localStorage.getItem('messages') && !localStorage.getItem('users')) {
-        const message4 = new Message({ id: 8, text: 'Cras dapibus', createdAt: '2020-10-13T13:05:00', author: 'Victoria' });
-        const message5 = new Message({ text: 'Curabitur ullamcorper ultricies', createdAt: '2020-10-13T13:05:00', author: 'Yanina' });
-        const arr = [message4, message5];
-        localStorage.setItem('messages', JSON.stringify(arr));
-        localStorage.setItem('users', JSON.stringify(['Victoria', 'Yanina', 'Alex']));
-        localStorage.setItem('user', JSON.stringify([{ loginSignUp: 'Victoria', passwordSignUp: 'qwe' }, { loginSignUp: 'Yanina', passwordSignUp: 'qwe' }, { loginSignUp: 'Alex', passwordSignUp: 'qwe' }]));
-    }
-}
-function foo() {
+async function foo() {
     const messages = document.querySelectorAll('.my-message-container');
     const arr = [...messages];
     let myMess;
     const eventClick = event.target;
     const container = eventClick.closest('.my-message-container');
     if (headerPrivate.style.display === 'flex') {
-         myMess = chatController.messageList.getPage(0, chatController.messageList._arrMessages.length, {
-            author: chatController.messageList.user,
-            to: namePrivateChat.textContent,
-        });
+        const response = await chatApiService.getMessages(0, 1000, { isPersonal: true, personalToFrom: currentUserPrivate, author: userNameHeader }, chatController.token);
+        const res = await response;
+        myMess = [...JSON.parse(res).reverse()];
     } else {
-        myMess = chatController.messageList.getPage(0, chatController.messageList._arrMessages.length, {
-        author: chatController.messageList.user });
+        const response = await chatApiService.getMessages(0, 1000, { isPersonal: false, author: userNameHeader });
+        const res = await response;
+        myMess = [...JSON.parse(res).reverse()];
     }
     const index = arr.indexOf(container);
-    return myMess[index].id;
+    return myMess[index];
 }
 
-function callBackMessageBody() {
+async function callBackMessageBody() {
     const eventClick = event.target;
     if (eventClick.className === 'my-message-text') {
         const buttons = [...eventClick.closest('.my-message-body').children].find((el) => el.className === 'buttons-delete-edit');
         buttons.style.visibility = 'visible';
     }
     if (eventClick.className === 'button-edit') {
-        const message = chatController.messageList.get(foo());
+        const response = await foo();
         textArea.style.display = 'none';
-        textArea3.style.display = 'none';
+        buttonEnterMessage.style.display = 'none';
         textArea2.style.display = 'block';
-        textArea2.value = message.text;
-        result = message.id;
+        textArea2.value = response.text;
+        result = response.id;
     }
     if (eventClick.className === 'button-delete') {
         const container = eventClick.closest('#my-message');
@@ -488,106 +628,100 @@ function callBackMessageBody() {
 }
 
 function scrollToEndPage() {
-    const endPage = [...document.querySelectorAll('.message-container'), ...document.querySelectorAll('.my-message-container')];
-    const size = endPage.length;
-    endPage[size - 1].scrollIntoView();
-}
-
-function checkedFilterValue(arr = []) {
-    const obj = {
-        author: arr[0],
-        text: arr[1],
-        dateFrom: arr[2],
-    };
-    for (const key in obj) {
-        if (!obj[key]) {
-            delete obj[key];
-        }
+    const arr = [...document.querySelectorAll('.message-container')];
+    if (arr.length > 0) {
+        const endPage = arr;
+        const size = endPage.length;
+        endPage[size - 1].scrollIntoView();
     }
-    if (headerPrivate.style.display === 'flex') obj.to = namePrivateChat.textContent;
-    return obj;
 }
 
-function formFilter() {
+async function formFilter() {
     event.preventDefault();
     const userName = document.getElementById('filter-name');
     const textMessage = document.getElementById('filter-text');
     const dateMessage = document.getElementById('filter-date');
-    const filters = checkedFilterValue([userName.value, textMessage.value, dateMessage.value]);
-    chatController.showMessages(0, chatController.messageList._arrMessages.length, filters);
-    showMore.style.display = 'none';
-    if (!chatController.messagesView.container.innerHTML) {
-        chatController.messagesView.container.innerHTML = '<p class="nothing-to-found">Nothing to found.</p>';
+
+    const filters = { author: userName.value, text: textMessage.value, dateFrom: dateMessage.value };
+    if (headerPrivate.style.display === 'flex') {
+        filters.isPersonal = true;
+        filters.personalToFrom = currentUserPrivate;
+    } else {
+        filters.isPersonal = false;
     }
+    await chatController.showMessages(0, 100, filters, 2000);
+
+    showMore.style.display = 'none';
+        if (chatController._size === 0) {
+            chatController.messagesView.container.innerHTML = '<p class="nothing-to-found">Nothing to found.</p>';
+        }
     userName.value = '';
     textMessage.value = '';
     dateMessage.value = '';
 }
 
-function callBackPrivateMessages() {
+async function callBackPrivateMessages() {
     const eventClick = event.target;
-    if (chatController.messageList.user && (eventClick.tagName === 'svg' || eventClick.tagName === 'path')) {
-        const activeUser = eventClick.closest('.active-user').lastElementChild.textContent;
-        chatController.showMessages(0, chatController.messageList._arrMessages.length, { to: activeUser });
+    if (eventClick.tagName === 'svg' || eventClick.tagName === 'path') {
+        currentUserPrivate = eventClick.closest('.active-user').lastElementChild.textContent;
         showMore.style.display = 'none';
         headerPrivate.style.display = 'flex';
-        namePrivateChat.textContent = activeUser;
-        textArea3.style.display = 'flex';
-        textArea.style.display = 'none';
+        namePrivateChat.textContent = currentUserPrivate;
+        await chatController.showMessages(0, 1000, { isPersonal: true, personalToFrom: currentUserPrivate });
     }
 }
 
 function callBackEditMess() {
     if (event.which === 13 && !event.shiftKey) {
-        chatController.editMessage(result, { text: textArea2.value });
-        headerPrivate.style.display === 'flex'
-            ? chatController.showMessages(0, chatController.messageList._arrMessages.length, { to: namePrivateChat.textContent })
-            : chatController.showMessages(0, chatController.messageList._arrMessages.length);
-        scrollToEndPage();
         showMore.style.display = 'none';
         textArea2.style.display = 'none';
         textArea.style.display = 'block';
+        buttonEnterMessage.style.display = 'block';
+        headerPrivate.style.display === 'none'
+        ? chatController.editMessage(result, { text: textArea2.value })
+            : chatController.editMessage(result, { text: textArea2.value, to: currentUserPrivate });
     }
 }
 
-function callBackShowMore() {
-    if (chatController.messageList._arrMessages.length > 0) {
+async function callBackShowMore() {
+    buttonIsHidden = false;
+    const res = await chatApiService.getMessages(0, 1000);
+    if (JSON.parse(res).length > 0) {
         myTop += 10;
-        chatController.showMessages(0, myTop);
-        scrollToEndPage();
-        if (chatController.messageList._arrMessages.length - myTop < 0) {
+        chatController.showMessages(0, myTop, {}, 1000);
+
+        if (JSON.parse(res).length - myTop <= 0) {
             showMore.style.display = 'none';
+            myTop = 10;
+            buttonIsHidden = true;
         }
     }
 }
 
-function addPrivateMessages() {
-    if (event.which === 13 && !event.shiftKey) {
-        chatController.addMessage({ text: textArea3.value, isPersonal: true, to: namePrivateChat.textContent });
-        textArea3.value = '';
-        scrollToEndPage();
-    }
-}
 function returnToChat() {
     headerPrivate.style.display = 'none';
-    textArea3.style.display = 'none';
-    textArea.style.display = 'flex';
     chatController.showMessages();
-    scrollToEndPage();
 }
 
 function addMessages() {
+    event.preventDefault();
     if (event.which === 13 && !event.shiftKey) {
-        chatController.addMessage({ text: textArea.value });
-        textArea.value = '';
-        chatController.showMessages(0, chatController.messageList._arrMessages.length);
-        showMore.style.display = 'none';
-        scrollToEndPage();
+        addMessagesButton();
     }
 }
 
-function confirmDeleteMessage() {
-        chatController.removeMessage(foo());
+function addMessagesButton() {
+    event.preventDefault();
+    headerPrivate.style.display === 'flex'
+        ? chatController.addMessage({ text: textArea.value, author: userNameHeader, to: currentUserPrivate })
+        : chatController.addMessage({ text: textArea.value, author: userNameHeader });
+    textArea.value = '';
+    showMore.style.display = 'none';
+}
+
+async function confirmDeleteMessage() {
+    const response = await foo();
+    await chatController.removeMessage(response.id);
 }
 
 function clickButtonSignUp() {
@@ -602,31 +736,41 @@ function toMainPage() {
     buttonLogOut.style.visibility = 'visible';
 }
 
-function buttonLogOutIn() {
+async function buttonLogOutIn() {
     if (logInOut.textContent === 'Log out') {
         event.preventDefault();
-        const index = chatController.userList.activeUsers.indexOf(chatController.messageList.user);
-        chatController.userList.activeUsers.splice(index, 1);
-        chatController.setCurrentUser('');
-        document.getElementById('userNameId').innerText = '';
-        logInOut.textContent = 'Log in';
-        chatController.showMessages();
-        chatController.showUsers();
-        document.getElementById('input').style.visibility = 'hidden';
-        headerPrivate.style.display = 'none';
+        const response = await chatApiService.logout();
+        if (response.ok) {
+            chatController.setCurrentUser('');
+            document.getElementById('userNameId').innerText = '';
+            logInOut.textContent = 'Log in';
+            chatController.showMessages();
+            document.getElementById('input').style.visibility = 'hidden';
+            headerPrivate.style.display = 'none';
+        }
     } else {
         event.preventDefault();
         logInContainer.style.display = 'flex';
     }
 }
 
+function errorToHome() {
+    errorPage.style.display = 'none';
+    logo.style.display = 'flex';
+    buttonLogOut.style.display = 'block';
+    mainPage.style.display = 'flex';
+    showMore.style.display = 'flex';
+    document.getElementById('input').style.visibility = 'hidden';
+    logInOut.textContent = 'Log in';
+}
+
 textArea.addEventListener('keyup', addMessages);
+
+enterMessage.addEventListener('submit', addMessagesButton);
 
 textArea2.addEventListener('keyup', callBackEditMess);
 
 userList.addEventListener('click', callBackPrivateMessages);
-
-textArea3.addEventListener('keyup', addPrivateMessages);
 
 buttonReturnToChat.addEventListener('click', returnToChat);
 
