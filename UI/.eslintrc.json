@@ -3,6 +3,7 @@
         "airbnb-base"
     ],
     "rules": {
+        "no-return-await": "off",
         "no-unused-vars": "off",
         "no-restricted-syntax": "off",
         "no-plusplus": "off",
@@ -24,6 +25,7 @@
         "lines-between-class-members": "warn",
         "nonblock-statement-body-position": "warn",
         "no-multiple-empty-lines": "warn",
+        "consistent-return": "off",
         "space-before-function-paren": "warn",
         "indent": "off",
         "autofix/no-debugger": "off",

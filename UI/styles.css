@@ -121,11 +121,11 @@
         width: 25%;
     }
     .chat{
-        width: 60%;
+        width: 64%;
     }
     .user-list{
         display: flex;
-        width: 20%;
+        width: 18%;
     }
     .users,.users-list{
         width: 100%;
@@ -133,7 +133,7 @@
     .filter-container{
         display: grid;
         grid-template-rows: 1.6rem 1.6rem 1.6rem 1.6rem;
-        width: 20%;
+        width: 18%;
     }
     .filter-name,.filter-text,.filter-date{
         width: 100%;
@@ -343,7 +343,54 @@ header{
 
 
 
+/*-------------------------ERROR---------------------------*/
+.error-container {
+    display: none;
+    justify-content: center;
+    margin-top: 5rem;
+    background-color: #10100F;
+}
+.error-body {
+    display: flex;
+    height: 50%;
+}
+.error-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 4rem;
+}
+.error-text span {
+    font-size: 1.7rem;
+    font-family: 'Roboto', sans-serif;
+    color: #f3ccc6;
+}
 
+.error-text button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 6rem;
+    height: 1.8rem;
+    margin-top: 2rem;
+    background-color: #292929;
+    color: #f3ccc6;
+    border-radius: 0.3rem;
+    border: none;
+}
+.error-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.error-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 17rem;
+    height: 15rem;
+}
 
 /*---------------------MAIN--------------------------------*/
 main{
@@ -351,20 +398,23 @@ main{
     flex-direction: row;
     justify-content: flex-end;
     background-color: #10100F;
+    overflow-x:hidden;
+
 }
 /*---USER-LIST---*/
 .user-list{
     flex-direction: column;
     align-items: flex-end;
     background-color: #10100F;
-    border-width: 0;
+    border: none;
 }
 .users{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 1.5rem;
     margin-bottom: 0.5rem;
     margin-right: 0.2rem;
-    padding-top: 0.25rem;
-    text-align: center;
     color: rgba(236, 182, 175, 0.92);
     background-color: #1B1A1A;
     border-radius: 0.5rem;
@@ -374,6 +424,8 @@ main{
     flex-direction: column;
     justify-content: center;
     overflow: auto;
+    padding-top: 0.5rem;
+    overflow-x:hidden;
 }
 .active-user{
     display: flex;
@@ -436,7 +488,7 @@ main{
     background-color: #272525;
 }
 .button-show-more{
-    display: none;
+    display: flex;
     justify-content: center;
     height: 1.1rem;
     width: 6rem;
@@ -569,16 +621,33 @@ main{
 #input {
     visibility: hidden;
 }
+#formTextArea {
+    display: flex;
+    align-items: center;
+}
+#formTextArea button {
+    margin-left: 0.5rem;
+    padding-top: 0.2rem;
+    height: 2.2rem;
+    width: 2.2rem;
+    color: #706E6E;
+    background-color: #0a0a0a;
+    border-radius: 0.5rem;
+    border: none;
+}
 #text-area-enter2, #text-area-enter3 {
     display: none;
 }
-#text-area-enter, #text-area-enter2, #text-area-enter3{
+#text-area-enter, #text-area-enter2 {
     height: 3.8rem;
-    width: 100%;
-    color: #A3A1A1;
+    color: #c8c3c3;
     background-color: #1A1818;
     border-width: 0;
     border-radius: 0.5rem;
+}
+#submitTextArea .iconify {
+    width: 1.6rem;
+    height: 1.9rem;
 }
 #text-area-enter::-webkit-input-placeholder, #text-area-enter2::-webkit-input-placeholder, #text-area-enter3::-webkit-input-placeholder{
     color: #585656;
@@ -700,7 +769,12 @@ footer{
 .button-return-to-chat button:hover {
     background-color: #e9bcb7;
 }
-
+#formTextArea button:hover {
+    background-color: black;
+}
+#submitTextArea .iconify:hover {
+    color: #aeaaaa;
+}
 /*--------------------SCROLL--------------------------------*/
 ::-webkit-scrollbar-track {
     background-color: #2C2C2B;

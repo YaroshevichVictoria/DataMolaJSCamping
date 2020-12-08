@@ -10,10 +10,23 @@
 </head>
 <body id="body">
         <header id="header">
-            <img src="img/Logo.png" alt="Logotype" class="logo">
+            <img src="img/Logo.png" alt="Logotype" class="logo" id="logo">
             <span class="user-name" id = "userNameId"></span>
             <button type="button" class="button-log-out" id="button-log-out">Log in</button>
         </header>
+
+        <div class="error-container" id="errorContainer">
+            <div class="error-body">
+                <div class="error-img-container">
+                    <img src="img/error.png" class="error-image" alt="">
+                </div>
+                <div class="error-text">
+                    <span>Something went wrong!</span>
+                    <button class="errorButton" type="button" id="errorButton">To home</button>
+                </div>
+            </div>
+        </div>
+
 
         <main id="main">
             <div class="user-list">
@@ -22,10 +35,17 @@
             </div>
             <div class="chat" id="chat">
                 <div class="enter-message-container" id="input">
-                    <textarea id="text-area-enter" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
-                    <textarea id="text-area-enter2" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
-                    <textarea id="text-area-enter3" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                    <form id="formTextArea">
+                        <textarea id="text-area-enter" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                        <textarea id="text-area-enter2" cols="102" rows="3"  placeholder="  Press Enter to send the message."></textarea>
+                        <button type="submit" id="submitTextArea">
+                            <span class="iconify" data-icon="eva:navigation-2-outline" data-inline="false"/>
+                        </button>
+                    </form>
                 </div>
+
+
+
                 <div class="messages" id = "messages"></div>
                 <button type="button" class="button-show-more" id="button-show-more">Show more</button>
 
