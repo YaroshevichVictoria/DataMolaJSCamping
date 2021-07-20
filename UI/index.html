@@ -12,24 +12,23 @@
         <header id="header">
             <img src="img/Logo.png" alt="Logotype" class="logo" id="logo">
             <span class="user-name" id = "userNameId"></span>
-            <button type="button" class="button-log-out" id="button-log-out">Log in</button>
+            <button type="button" id="button-log-out">Log in</button>
         </header>
 
         <div class="error-container" id="errorContainer">
             <div class="error-body">
                 <div class="error-img-container">
-                    <img src="img/error.png" class="error-image" alt="">
                 </div>
-                <div class="error-text">
+                <div class="error-tex">
+                    <div></div>
                     <span>Something went wrong!</span>
-                    <button class="errorButton" type="button" id="errorButton">To home</button>
                 </div>
             </div>
         </div>
 
 
         <main id="main">
-            <div class="user-list">
+            <div class="user-list" id="1">
                 <div class="users">Users</div>
                 <div class="users-list" id="users-list"></div>
             </div>
@@ -46,7 +45,7 @@
 
 
 
-                <div class="messages" id = "messages"></div>
+                <div class="messages"></div>
                 <button type="button" class="button-show-more" id="button-show-more">Show more</button>
 
                 <div class="header-private-chat" id="headerPrivateChat">
@@ -60,13 +59,6 @@
                 </div>
 
             </div>
-
-            <form class="filter-container" id="filter-container">
-                <input type="text" class="filter-name" id="filter-name" placeholder=" Enter name...">
-                <input type="text" class="filter-text" id="filter-text" placeholder=" Enter text...">
-                <input type="date" class="filter-date" id="filter-date"  placeholder=" Enter date...">
-                <button type="submit" class="button-filter">Find</button>
-            </form>
 
             <div id="sign-up-container">
                 <div class="sign-up-container">
@@ -107,7 +99,7 @@
             </div>
         </main>
         <footer>
-            <span class="name-chat">EduChat 1.0</span>
+            <span>EduChat 1.0</span>
             <span class="author">
                 <p>
                     15.10.2020
